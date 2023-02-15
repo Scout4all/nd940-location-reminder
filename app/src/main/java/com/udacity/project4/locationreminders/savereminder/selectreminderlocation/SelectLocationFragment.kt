@@ -5,10 +5,12 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.content.res.Resources
+import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
 
 import android.view.*
+
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
@@ -40,6 +42,14 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     private lateinit var mMap: GoogleMap
     private val REQUEST_LOCATION_PERMISSION = 1
 
+   private lateinit var geofencingClient: GeofencingClient
+   private lateinit var geofenciHelper: GeoFenceHelper
+    private val runningQOrLater =
+        android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q
+
+    override fun onStart() {
+        super.onStart()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -58,12 +68,31 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
 
 
+        geofenciHelper = GeoFenceHelper(requireContext())
+        geofencingClient = geofenciHelper.geofencingClient
+        geofenciHelper.removeGeofence()
+
 
         return binding.root
     }
 
+    @SuppressLint("MissingPermission")
+    private fun addGeoFence(latLng: LatLng, radius: Float, placeId: String){
+        val geofence = geofenciHelper.getGeoFence(placeId,latLng,radius,Geofence.GEOFENCE_TRANSITION_ENTER)
+        val pendingIntent = geofenciHelper.geofenceIntent
+val geofencingRequest = geofenciHelper.geoFencingRequest(geofence)
+        geofencingClient.addGeofences(geofencingRequest,pendingIntent)
+            .addOnFailureListener {
+                val errorMessage = geofenciHelper.errorString(it)
+                Timber.e(errorMessage)
+            }
+
+
+    }
     private fun onLocationSelected(map: GoogleMap) {
+
         map.setOnPoiClickListener { poi ->
+            map.clear()
             map.addMarker(
                 MarkerOptions()
                     .position(poi.latLng)
@@ -73,9 +102,14 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
             _viewModel.longitude.value = poi.latLng.longitude
             _viewModel.selectedPOI.value = poi
             _viewModel.reminderSelectedLocationStr.value = poi.name
+
             if (_viewModel.reminderTitle.value.isNullOrEmpty()) {
                 _viewModel.reminderTitle.value = poi.name
             }
+
+            addCircle(poi.latLng,150f)
+            addGeoFence(poi.latLng,150f,poi.placeId)
+
 
             val snackbar =
                 Snackbar.make(binding.root, "Confirm add ${poi.name}", Snackbar.LENGTH_LONG)
@@ -85,8 +119,19 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
             snackbar.show()
         }
 
-    }
 
+    }
+private fun addCircle(latLng: LatLng, radius:Float = 100f){
+    val circleOptions = CircleOptions()
+    circleOptions.radius( radius.toDouble())
+    circleOptions.center(latLng)
+    circleOptions.strokeColor(Color.argb(255,255,0,0))
+    circleOptions.fillColor(Color.argb(64,255,0,0))
+    circleOptions.strokeWidth(4f)
+    mMap.addCircle(circleOptions)
+
+
+}
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
         getCurrentLocation()
@@ -132,7 +177,10 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
             requireContext(),
             Manifest.permission.ACCESS_FINE_LOCATION
         ) === PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(requireContext(),
+            Manifest.permission.ACCESS_BACKGROUND_LOCATION) === PackageManager.PERMISSION_GRANTED
     }
+
 
     @SuppressLint("MissingPermission")
     private fun enableMyLocation() {
@@ -141,7 +189,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         } else {
             ActivityCompat.requestPermissions(
                 requireActivity(),
-                arrayOf<String>(Manifest.permission.ACCESS_FINE_LOCATION),
+                arrayOf<String>(Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_BACKGROUND_LOCATION),
                 REQUEST_LOCATION_PERMISSION
             )
         }

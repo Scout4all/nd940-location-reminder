@@ -87,8 +87,4 @@ class SaveReminderViewModel(val app: Application, val dataSource: ReminderDataSo
     }
 
 
-    private fun registerGeofence(){
-      val  geofencingClient = LocationServices.getGeofencingClient(app)
-
-    }
 }
