@@ -8,6 +8,7 @@ import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.model.LatLng
 import com.udacity.project4.locationreminders.geofence.GeofenceBroadcastReceiver
+import com.udacity.project4.utils.ACTION_GEOFENCE_EVENT
 import timber.log.Timber
 
 class GeoFenceHelper(base: Context?) : ContextWrapper(base) {
@@ -18,8 +19,13 @@ class GeoFenceHelper(base: Context?) : ContextWrapper(base) {
 
 
      val geofenceIntent: PendingIntent by lazy {
-        val intent = Intent(this, GeofenceBroadcastReceiver::class.java)
-        PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+//         val intent = Intent("com.aol.android.geofence.ACTION_RECEIVE_GEOFENCE")
+//            Intent intent = new Intent(context, ReceiveTransitionsIntentService.class);
+
+         val intent = Intent(this, GeofenceBroadcastReceiver::class.java)
+//         intent.action = ACTION_GEOFENCE_EVENT
+
+         PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
     }
 
     fun geoFencingRequest(geofence: Geofence) : GeofencingRequest {
@@ -36,6 +42,7 @@ class GeoFenceHelper(base: Context?) : ContextWrapper(base) {
         .setTransitionTypes(transitionTypes)
        .setLoiteringDelay(5000)
        .setExpirationDuration(Geofence.NEVER_EXPIRE)
+       .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
        .build()
     }
 

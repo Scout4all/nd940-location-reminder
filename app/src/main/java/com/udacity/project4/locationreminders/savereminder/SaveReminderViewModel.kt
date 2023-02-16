@@ -60,7 +60,7 @@ class SaveReminderViewModel(val app: Application, val dataSource: ReminderDataSo
                     reminderData.location,
                     reminderData.latitude,
                     reminderData.longitude,
-                    reminderData.id
+                    reminderData.id!!
                 )
             )
             showLoading.value = false

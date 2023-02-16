@@ -42,8 +42,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     private lateinit var mMap: GoogleMap
     private val REQUEST_LOCATION_PERMISSION = 1
 
-   private lateinit var geofencingClient: GeofencingClient
-   private lateinit var geofenciHelper: GeoFenceHelper
+
     private val runningQOrLater =
         android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q
 
@@ -66,29 +65,10 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         mMapFragment = (childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?)!!
         mMapFragment.getMapAsync(this);
 
-
-
-        geofenciHelper = GeoFenceHelper(requireContext())
-        geofencingClient = geofenciHelper.geofencingClient
-        geofenciHelper.removeGeofence()
-
-
         return binding.root
     }
 
-    @SuppressLint("MissingPermission")
-    private fun addGeoFence(latLng: LatLng, radius: Float, placeId: String){
-        val geofence = geofenciHelper.getGeoFence(placeId,latLng,radius,Geofence.GEOFENCE_TRANSITION_ENTER)
-        val pendingIntent = geofenciHelper.geofenceIntent
-val geofencingRequest = geofenciHelper.geoFencingRequest(geofence)
-        geofencingClient.addGeofences(geofencingRequest,pendingIntent)
-            .addOnFailureListener {
-                val errorMessage = geofenciHelper.errorString(it)
-                Timber.e(errorMessage)
-            }
 
-
-    }
     private fun onLocationSelected(map: GoogleMap) {
 
         map.setOnPoiClickListener { poi ->
@@ -102,18 +82,17 @@ val geofencingRequest = geofenciHelper.geoFencingRequest(geofence)
             _viewModel.longitude.value = poi.latLng.longitude
             _viewModel.selectedPOI.value = poi
             _viewModel.reminderSelectedLocationStr.value = poi.name
-
-            if (_viewModel.reminderTitle.value.isNullOrEmpty()) {
-                _viewModel.reminderTitle.value = poi.name
-            }
-
             addCircle(poi.latLng,150f)
-            addGeoFence(poi.latLng,150f,poi.placeId)
+
 
 
             val snackbar =
                 Snackbar.make(binding.root, "Confirm add ${poi.name}", Snackbar.LENGTH_LONG)
             snackbar.setAction("Confirm", {
+                if (_viewModel.reminderTitle.value.isNullOrEmpty()) {
+                    _viewModel.reminderTitle.value = poi.name
+                }
+
                 _viewModel.navigationCommand.value = NavigationCommand.Back
             })
             snackbar.show()
