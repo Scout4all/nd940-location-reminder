@@ -5,4 +5,8 @@
         android:id="@+id/logout"
         android:title="@string/logout"
         app:showAsAction="always" />
+    <item
+        android:id="@+id/delete_all"
+        android:title="Delete All Notes"
+        app:showAsAction="never" />
 </menu>

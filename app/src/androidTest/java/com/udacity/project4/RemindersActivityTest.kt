@@ -7,6 +7,7 @@ import androidx.test.filters.LargeTest
 import com.udacity.project4.locationreminders.data.ReminderDataSource
 import com.udacity.project4.locationreminders.data.local.LocalDB
 import com.udacity.project4.locationreminders.data.local.RemindersLocalRepository
+import com.udacity.project4.locationreminders.geofence.GeoFenceHelper
 import com.udacity.project4.locationreminders.reminderslist.RemindersListViewModel
 import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
 import kotlinx.coroutines.runBlocking
@@ -16,14 +17,14 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.dsl.module
-import org.koin.test.AutoCloseKoinTest
+ import org.koin.test.KoinTest
 import org.koin.test.get
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 //END TO END test to black box test the app
 class RemindersActivityTest :
-    AutoCloseKoinTest() {// Extended Koin Test - embed autoclose @after method to close Koin after every test
+    KoinTest {// Extended Koin Test - embed autoclose @after method to close Koin after every test
 
     private lateinit var repository: ReminderDataSource
     private lateinit var appContext: Application
@@ -40,17 +41,20 @@ class RemindersActivityTest :
             viewModel {
                 RemindersListViewModel(
                     appContext,
-                    get() as ReminderDataSource
+                    get() as ReminderDataSource,
+                    get()
                 )
             }
             single {
                 SaveReminderViewModel(
                     appContext,
-                    get() as ReminderDataSource
+                    get() as ReminderDataSource ,
+                    get()
                 )
             }
             single { RemindersLocalRepository(get()) as ReminderDataSource }
             single { LocalDB.createRemindersDao(appContext) }
+            single { GeoFenceHelper(appContext) }
         }
         //declare a new koin module
         startKoin {

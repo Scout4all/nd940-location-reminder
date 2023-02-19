@@ -1,4 +1,4 @@
-package com.udacity.project4.locationreminders.savereminder.selectreminderlocation
+package com.udacity.project4.locationreminders.geofence
 
 import android.annotation.SuppressLint
 import android.app.Application
@@ -8,21 +8,41 @@ import android.content.Intent
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.model.LatLng
-import com.udacity.project4.locationreminders.geofence.GeofenceBroadcastReceiver
 import com.udacity.project4.utils.ACTION_GEOFENCE_EVENT
+import com.udacity.project4.utils.GEOFENCE_PENDING_INTENT_CODE
 import timber.log.Timber
 
+@SuppressLint("InlinedApi", "UnspecifiedImmutableFlag")
 class GeoFenceHelper(base: Application?) : ContextWrapper(base) {
 
     private val geofencingClient: GeofencingClient = LocationServices.getGeofencingClient(base!!)
 
     private val geofenceIntent: PendingIntent by lazy {
-
-
+        val runningSOrLater = android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S
         val intent = Intent(base, GeofenceBroadcastReceiver::class.java)
         intent.action = ACTION_GEOFENCE_EVENT
+        when (runningSOrLater) {
+            true -> {
+                PendingIntent.getBroadcast(
+                    base,
+                    GEOFENCE_PENDING_INTENT_CODE,
+                    intent,
+                    PendingIntent.FLAG_MUTABLE
+                )
 
-        PendingIntent.getBroadcast(base, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+            }
+            false -> {
+                PendingIntent.getBroadcast(
+                    base,
+                    GEOFENCE_PENDING_INTENT_CODE,
+                    intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT
+                )
+
+            }
+
+        }
+
     }
 
     private fun geoFencingRequest(geofence: Geofence): GeofencingRequest {
@@ -44,7 +64,7 @@ class GeoFenceHelper(base: Application?) : ContextWrapper(base) {
             .setRequestId(id)
             .setTransitionTypes(transitionTypes)
             .setLoiteringDelay(1000)
-             .setExpirationDuration(Geofence.NEVER_EXPIRE)
+            .setExpirationDuration(Geofence.NEVER_EXPIRE)
             .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
             .build()
     }

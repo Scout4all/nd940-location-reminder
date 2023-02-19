@@ -113,10 +113,10 @@ private fun addCircle(latLng: LatLng, radius:Float = LOCATION_DEFAULT_RADIUS){
 }
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-        getCurrentLocation()
-        enableMyLocation()
-        onLocationSelected(mMap)
-        setMapStyle(mMap)
+        getCurrentLocation(googleMap)
+        enableMyLocation(googleMap)
+        onLocationSelected(googleMap)
+        setMapStyle(googleMap)
     }
 
 
@@ -162,10 +162,10 @@ private fun addCircle(latLng: LatLng, radius:Float = LOCATION_DEFAULT_RADIUS){
 
 
     @SuppressLint("MissingPermission")
-    private fun enableMyLocation() {
+    private fun enableMyLocation(map : GoogleMap) {
         if (isPermissionGranted()) {
-            mMap.setMyLocationEnabled(true)
-            getCurrentLocation()
+            map.setMyLocationEnabled(true)
+            getCurrentLocation(map)
         }
     }
 
@@ -173,7 +173,7 @@ private fun addCircle(latLng: LatLng, radius:Float = LOCATION_DEFAULT_RADIUS){
 
 
     @SuppressLint("MissingPermission")
-    private fun getCurrentLocation() {
+    private fun getCurrentLocation(map : GoogleMap) {
         var lastKnownLocation: Location?
 
 
@@ -189,7 +189,7 @@ private fun addCircle(latLng: LatLng, radius:Float = LOCATION_DEFAULT_RADIUS){
                         // Set the map's camera position to the current location of the device.
                         lastKnownLocation = task.result
                         if (lastKnownLocation != null) {
-                            mMap.moveCamera(
+                            map.moveCamera(
                                 CameraUpdateFactory.newLatLngZoom(
                                     LatLng(
                                         lastKnownLocation!!.latitude,
@@ -201,11 +201,11 @@ private fun addCircle(latLng: LatLng, radius:Float = LOCATION_DEFAULT_RADIUS){
                     } else {
                         Timber.d("Current location is null. Using defaults.")
                         Timber.e("Exception: %s", task.exception)
-                        mMap.moveCamera(
+                        map.moveCamera(
                             CameraUpdateFactory
                                 .newLatLngZoom(defaultLocation, DEFAULT_ZOOM)
                         )
-                        mMap.uiSettings.isMyLocationButtonEnabled = false
+                        map.uiSettings.isMyLocationButtonEnabled = false
                     }
                 }
             }

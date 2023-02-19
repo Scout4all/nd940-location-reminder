@@ -7,9 +7,8 @@ import com.udacity.project4.base.BaseViewModel
 import com.udacity.project4.locationreminders.data.ReminderDataSource
 import com.udacity.project4.locationreminders.data.dto.ReminderDTO
 import com.udacity.project4.locationreminders.data.dto.Result
-import com.udacity.project4.locationreminders.savereminder.selectreminderlocation.GeoFenceHelper
+import com.udacity.project4.locationreminders.geofence.GeoFenceHelper
 import kotlinx.coroutines.launch
-import org.koin.java.KoinJavaComponent.inject
 
 import timber.log.Timber
 
@@ -62,8 +61,15 @@ class RemindersListViewModel(
           Timber.e("delete item ${id}")
         viewModelScope.launch {
         dataSource.getReminder(id)
-
             geoFenceHelper.removeGeofence(listOf(id))
+            loadReminders()
+        }
+    }
+
+    fun deleteAllReminders(){
+        viewModelScope.launch {
+            dataSource.deleteAllReminders()
+            geoFenceHelper.removeGeofence()
             loadReminders()
         }
     }

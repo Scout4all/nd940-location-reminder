@@ -2,22 +2,15 @@ package com.udacity.project4
 
 import android.app.Application
 import android.content.Intent
-import androidx.core.app.ActivityCompat
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.Observer
-import androidx.lifecycle.map
-import com.udacity.project4.authentication.AuthState
-import com.udacity.project4.authentication.AuthenticationActivity
- import com.udacity.project4.base.NavigationCommand
-import com.udacity.project4.locationreminders.ReminderDescriptionActivity
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.udacity.project4.locationreminders.RemindersActivity
 import com.udacity.project4.locationreminders.data.ReminderDataSource
 import com.udacity.project4.locationreminders.data.local.LocalDB
 import com.udacity.project4.locationreminders.data.local.RemindersLocalRepository
 import com.udacity.project4.locationreminders.reminderslist.RemindersListViewModel
 import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
-import com.udacity.project4.locationreminders.savereminder.selectreminderlocation.GeoFenceHelper
+import com.udacity.project4.locationreminders.geofence.GeoFenceHelper
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.startKoin
@@ -44,6 +37,7 @@ class MyApp : Application()  {
                     get()
                 )
             }
+
             //Declare singleton definitions to be later injected using by inject()
             single {
                 //This view model is declared singleton to be used across multiple fragments
@@ -63,6 +57,16 @@ class MyApp : Application()  {
         startKoin {
             androidContext(this@MyApp)
             modules(listOf(myModule))
+        }
+        isLoggedIn()
+
+    }
+
+    private fun isLoggedIn(){
+        if (Firebase.auth.currentUser != null) {
+            val intent = Intent(this, RemindersActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            startActivity(intent)
         }
     }
 

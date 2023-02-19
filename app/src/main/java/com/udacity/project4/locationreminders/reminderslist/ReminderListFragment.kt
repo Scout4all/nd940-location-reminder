@@ -11,6 +11,7 @@ import com.udacity.project4.authentication.AuthenticationActivity
 import com.udacity.project4.base.BaseFragment
 import com.udacity.project4.base.NavigationCommand
 import com.udacity.project4.databinding.FragmentRemindersBinding
+import com.udacity.project4.locationreminders.ReminderDescriptionActivity
 import com.udacity.project4.utils.setDisplayHomeAsUpEnabled
 import com.udacity.project4.utils.setTitle
 import com.udacity.project4.utils.setup
@@ -74,11 +75,10 @@ class ReminderListFragment : BaseFragment() {
 
     private fun setupRecyclerView() {
         val adapter = RemindersListAdapter {
-            _viewModel.navigationCommand.postValue(
-                NavigationCommand.To(
-                    ReminderListFragmentDirections.toSaveReminder(it)
-                )
-            )
+
+            val intent = ReminderDescriptionActivity.newIntent(requireActivity(), it)
+            startActivity(intent)
+
         }
 
 //        setup the recycler view using the extension function
@@ -99,8 +99,9 @@ class ReminderListFragment : BaseFragment() {
                     requireActivity().finish()
                 }
 
-
-
+            }
+            R.id.delete_all ->{
+                _viewModel.deleteAllReminders()
             }
         }
         return super.onOptionsItemSelected(item)

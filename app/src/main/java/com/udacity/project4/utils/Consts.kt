@@ -13,5 +13,7 @@ const val DEFAULT_ZOOM = 16f
 const val SIGN_IN_RESULT_CODE = 1001
 
 
+const val GEOFENCE_PENDING_INTENT_CODE = 155
+
 const val ACTION_GEOFENCE_EVENT =
  "GeofenceHelper.project4.action.ACTION_GEOFENCE_EVENT"

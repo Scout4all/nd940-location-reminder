@@ -40,7 +40,7 @@ fun sendNotification(context: Context, reminderDataItem: ReminderDataItem) {
     val notificationPendingIntent = stackBuilder
         .getPendingIntent(getUniqueId(), PendingIntent.FLAG_UPDATE_CURRENT)
         val notificationContentText = if(reminderDataItem.description.isNullOrEmpty()){
-            "You have entered ${reminderDataItem.location} zone }"
+            "You have entered ${reminderDataItem.location} zone"
         }else{
             "You have entered ${reminderDataItem.location} zone to ${reminderDataItem.description}"
         }

@@ -14,4 +14,5 @@ class DataBindingViewHolder<T>(private val binding: ViewDataBinding) :
         binding.setVariable(BR.item , item)
         binding.executePendingBindings()
     }
+
 }
