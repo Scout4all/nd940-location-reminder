@@ -15,7 +15,7 @@ interface RemindersDao {
     /**
      * @return all reminders.
      */
-    @Query("SELECT * FROM reminders")
+    @Query("SELECT * FROM reminders order by location asc")
     suspend fun getReminders(): List<ReminderDTO>
 
     /**
@@ -38,5 +38,7 @@ interface RemindersDao {
      */
     @Query("DELETE FROM reminders")
     suspend fun deleteAllReminders()
+    @Query("DELETE FROM reminders where entry_id =:id")
+    suspend fun deleteReminder(id: String)
 
 }

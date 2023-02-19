@@ -5,11 +5,23 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
+import androidx.lifecycle.map
 import com.firebase.ui.auth.AuthUI
+import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.IdpResponse
+import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.udacity.project4.R
+import com.udacity.project4.databinding.ActivityAuthenticationBinding
+import com.udacity.project4.locationreminders.RemindersActivity
+import com.udacity.project4.utils.SIGN_IN_RESULT_CODE
+import timber.log.Timber
 
 /**
  * This class should be the starting point of the app, It asks the users to sign in / register, and redirects the
@@ -17,52 +29,60 @@ import com.udacity.project4.R
  */
 class AuthenticationActivity : AppCompatActivity() {
 
-
-      val TAG = "MainFragment"
-        val SIGN_IN_RESULT_CODE = 1001
-
+    private lateinit var binding : ActivityAuthenticationBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_authentication)
-//         TODO: Implement the create account and sign in using FirebaseUI, use sign in using email and sign in using Google
+        binding = DataBindingUtil.setContentView(this,R.layout.activity_authentication)
+        binding.lifecycleOwner = this
+if(Firebase.auth.currentUser != null){
+    val intent = Intent(this,RemindersActivity::class.java)
+    startActivity(intent)
+}
 
-//          TODO: If the user was authenticated, send him to RemindersActivity
 
-//          TODO: a bonus is to customize the sign in flow to look nice using :
-        //https://github.com/firebase/FirebaseUI-Android/blob/master/auth/README.md#custom-layout
-        login()
-
+    binding.loginButton.setOnClickListener {
+        signInFlow()
     }
 
-    private fun login(){
-        val providers = arrayListOf(
-            AuthUI.IdpConfig.EmailBuilder().build(), AuthUI.IdpConfig.GoogleBuilder().build()
+    }
+    private val signInLauncher = registerForActivityResult(
+        FirebaseAuthUIActivityResultContract()) { res ->
+        this.onSignInResult(res)
+    }
 
+    private fun signInFlow(){
+        val providers = arrayListOf(
+            AuthUI.IdpConfig.GoogleBuilder().build(),
+            AuthUI.IdpConfig.EmailBuilder().build(),
         )
-        startActivityForResult(
-            AuthUI.getInstance()
+
+        val signInIntent=  AuthUI.getInstance()
                 .createSignInIntentBuilder()
                 .setIsSmartLockEnabled(false)
                 .setAvailableProviders(providers)
-                .build(),
-            SIGN_IN_RESULT_CODE
-        )
+                .setLogo(R.mipmap.ic_launcher_round)
+                .setTheme(R.style.AppTheme)
+                .setTosAndPrivacyPolicyUrls(
+                    "https://example.com/terms.html",
+                    "https://example.com/privacy.html")
+                .build()
+
+        signInLauncher.launch(signInIntent)
+
     }
 
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == SIGN_IN_RESULT_CODE) {
-            val response = IdpResponse.fromResultIntent(data)
-            if (resultCode == Activity.RESULT_OK) {
-                // User successfully signed in
-                Log.i(TAG, "Successfully signed in user ${FirebaseAuth.getInstance().currentUser?.displayName}!")
-            } else {
-                // Sign in failed. If response is null the user canceled the
-                // sign-in flow using the back button. Otherwise check
-                // response.getError().getErrorCode() and handle the error.
-                Log.i(TAG, "Sign in unsuccessful ${response?.error?.errorCode}")
-            }
+    private fun onSignInResult(result: FirebaseAuthUIAuthenticationResult) {
+        val response = result.idpResponse
+        if (result.resultCode == RESULT_OK) {
+            // Successfully signed in
+            val user = FirebaseAuth.getInstance().currentUser
+            Timber.i( "Successfully signed in user ${user?.displayName}!")
+        } else {
+
+            Timber.i( "Sign in unsuccessful ${response?.error?.errorCode}")
+
         }
     }
+
 }

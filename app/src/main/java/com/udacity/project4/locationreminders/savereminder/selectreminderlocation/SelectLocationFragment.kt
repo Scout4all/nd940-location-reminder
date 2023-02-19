@@ -27,6 +27,8 @@ import com.udacity.project4.base.BaseFragment
 import com.udacity.project4.base.NavigationCommand
 import com.udacity.project4.databinding.FragmentSelectLocationBinding
 import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
+import com.udacity.project4.utils.DEFAULT_ZOOM
+import com.udacity.project4.utils.LOCATION_DEFAULT_RADIUS
 import com.udacity.project4.utils.setDisplayHomeAsUpEnabled
 import org.koin.android.ext.android.inject
 import timber.log.Timber
@@ -40,7 +42,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     override val _viewModel: SaveReminderViewModel by inject()
     private lateinit var binding: FragmentSelectLocationBinding
     private lateinit var mMap: GoogleMap
-    private val REQUEST_LOCATION_PERMISSION = 1
+
 
 
     private val runningQOrLater =
@@ -82,9 +84,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
             _viewModel.longitude.value = poi.latLng.longitude
             _viewModel.selectedPOI.value = poi
             _viewModel.reminderSelectedLocationStr.value = poi.name
-            addCircle(poi.latLng,150f)
-
-
+            addCircle(poi.latLng, radius = 50f)
 
             val snackbar =
                 Snackbar.make(binding.root, "Confirm add ${poi.name}", Snackbar.LENGTH_LONG)
@@ -100,7 +100,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
 
     }
-private fun addCircle(latLng: LatLng, radius:Float = 100f){
+private fun addCircle(latLng: LatLng, radius:Float = LOCATION_DEFAULT_RADIUS){
     val circleOptions = CircleOptions()
     circleOptions.radius( radius.toDouble())
     circleOptions.center(latLng)
@@ -156,45 +156,27 @@ private fun addCircle(latLng: LatLng, radius:Float = 100f){
             requireContext(),
             Manifest.permission.ACCESS_FINE_LOCATION
         ) === PackageManager.PERMISSION_GRANTED
-                && ContextCompat.checkSelfPermission(requireContext(),
-            Manifest.permission.ACCESS_BACKGROUND_LOCATION) === PackageManager.PERMISSION_GRANTED
+
     }
+
 
 
     @SuppressLint("MissingPermission")
     private fun enableMyLocation() {
         if (isPermissionGranted()) {
             mMap.setMyLocationEnabled(true)
-        } else {
-            ActivityCompat.requestPermissions(
-                requireActivity(),
-                arrayOf<String>(Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_BACKGROUND_LOCATION),
-                REQUEST_LOCATION_PERMISSION
-            )
+            getCurrentLocation()
         }
     }
 
-    @Deprecated("Deprecated in Java")
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
-    ) {
-        // Check if location permissions are granted and if so enable the
-        // location data layer.
-        if (requestCode == REQUEST_LOCATION_PERMISSION) {
-            if (grantResults.size > 0 && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                enableMyLocation()
-            }
-        }
-    }
+
 
 
     @SuppressLint("MissingPermission")
     private fun getCurrentLocation() {
-        var lastKnownLocation: Location? = null
-        val DEFAULT_ZOOM = 16;
-        val TAG = "Selection"
+        var lastKnownLocation: Location?
+
+
         val defaultLocation = LatLng(-33.8523341, 151.2106085)
 
         val fusedLocationProviderClient: FusedLocationProviderClient =
@@ -212,7 +194,7 @@ private fun addCircle(latLng: LatLng, radius:Float = 100f){
                                     LatLng(
                                         lastKnownLocation!!.latitude,
                                         lastKnownLocation!!.longitude
-                                    ), DEFAULT_ZOOM.toFloat()
+                                    ), DEFAULT_ZOOM
                                 )
                             )
                         }
@@ -221,9 +203,9 @@ private fun addCircle(latLng: LatLng, radius:Float = 100f){
                         Timber.e("Exception: %s", task.exception)
                         mMap.moveCamera(
                             CameraUpdateFactory
-                                .newLatLngZoom(defaultLocation, DEFAULT_ZOOM.toFloat())
+                                .newLatLngZoom(defaultLocation, DEFAULT_ZOOM)
                         )
-                        mMap.uiSettings?.isMyLocationButtonEnabled = false
+                        mMap.uiSettings.isMyLocationButtonEnabled = false
                     }
                 }
             }

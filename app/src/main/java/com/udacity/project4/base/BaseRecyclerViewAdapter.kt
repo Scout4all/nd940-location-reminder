@@ -38,6 +38,7 @@ abstract class BaseRecyclerViewAdapter<T>(private val callback: ((item: T) -> Un
         holder.itemView.setOnClickListener {
             callback?.invoke(item)
         }
+
     }
 
     fun getItem(position: Int) = _items[position]

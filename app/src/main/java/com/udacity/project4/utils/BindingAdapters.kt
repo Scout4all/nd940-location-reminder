@@ -1,13 +1,16 @@
 package com.udacity.project4.utils
 
 import android.view.View
+import androidx.core.view.children
 import androidx.databinding.BindingAdapter
-import androidx.lifecycle.LiveData
+import androidx.lifecycle.*
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.udacity.project4.base.BaseRecyclerViewAdapter
+import com.udacity.project4.locationreminders.reminderslist.ReminderDataItem
 
 
-object BindingAdapters {
+object BindingAdapters  {
 
     /**
      * Use binding adapter to set the recycler view data using livedata object
@@ -20,6 +23,7 @@ object BindingAdapters {
             (recyclerView.adapter as? BaseRecyclerViewAdapter<T>)?.apply {
                 clear()
                 addData(itemList)
+
             }
         }
     }
@@ -44,4 +48,10 @@ object BindingAdapters {
             }
         }
     }
+
+
+
+
 }
+
+

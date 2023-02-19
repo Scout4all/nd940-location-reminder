@@ -8,6 +8,9 @@
         <variable
             name="item"
             type="com.udacity.project4.locationreminders.reminderslist.ReminderDataItem" />
+    <variable
+        name="viewModel"
+        type="com.udacity.project4.locationreminders.reminderslist.RemindersListViewModel" />
     </data>
 
     <androidx.cardview.widget.CardView
@@ -52,10 +55,22 @@
                 android:text="@{item.location}"
                 android:textColor="@color/colorAccent"
                 android:textSize="@dimen/text_size_small"
+                android:id="@+id/location"
                 app:layout_constraintBottom_toBottomOf="@+id/description"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/delete_btn"
                 app:layout_constraintTop_toTopOf="@+id/title"
                 tools:text="Location" />
+            <ImageButton
+                android:id="@+id/delete_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/baseline_delete_24"
+                android:backgroundTint="@color/white"
+                app:layout_constraintTop_toTopOf="parent"
+                android:onClick="@{()-> viewModel.deleteItem(item.id )}"
+               app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:contentDescription="delete item botton" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>

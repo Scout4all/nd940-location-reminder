@@ -39,14 +39,21 @@ fun sendNotification(context: Context, reminderDataItem: ReminderDataItem) {
         .addNextIntent(intent)
     val notificationPendingIntent = stackBuilder
         .getPendingIntent(getUniqueId(), PendingIntent.FLAG_UPDATE_CURRENT)
-
+        val notificationContentText = if(reminderDataItem.description.isNullOrEmpty()){
+            "You have entered ${reminderDataItem.location} zone }"
+        }else{
+            "You have entered ${reminderDataItem.location} zone to ${reminderDataItem.description}"
+        }
 //    build the notification object with the data to be shown
     val notification = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
-        .setSmallIcon(R.mipmap.ic_launcher)
+        .setSmallIcon(R.drawable.ic_launcher_foreground)
         .setContentTitle(reminderDataItem.title)
-        .setContentText("You have entered ${reminderDataItem.location} zone")
+        .setContentText(notificationContentText)
         .setContentIntent(notificationPendingIntent)
-        .setAutoCancel(true)
+
+            //ToDo set auto cancel to true
+        .setAutoCancel(false)
+
         .build()
 
     notificationManager.notify(getUniqueId(), notification)

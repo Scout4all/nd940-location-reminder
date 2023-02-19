@@ -1,10 +1,10 @@
 package com.udacity.project4.locationreminders.savereminder
 
 import android.app.Application
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.GeofencingClient
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.PointOfInterest
 import com.udacity.project4.R
 import com.udacity.project4.base.BaseViewModel
@@ -12,19 +12,19 @@ import com.udacity.project4.base.NavigationCommand
 import com.udacity.project4.locationreminders.data.ReminderDataSource
 import com.udacity.project4.locationreminders.data.dto.ReminderDTO
 import com.udacity.project4.locationreminders.reminderslist.ReminderDataItem
+import com.udacity.project4.locationreminders.savereminder.selectreminderlocation.GeoFenceHelper
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
-class SaveReminderViewModel(val app: Application, val dataSource: ReminderDataSource) :
+class SaveReminderViewModel(val app: Application, val dataSource: ReminderDataSource, private val geoFenceHelper: GeoFenceHelper) :
     BaseViewModel(app) {
 
-    val reminderTitle = MutableLiveData<String>()
-    val reminderDescription = MutableLiveData<String>()
-    val reminderSelectedLocationStr = MutableLiveData<String>()
-    val selectedPOI = MutableLiveData<PointOfInterest>()
-    val latitude = MutableLiveData<Double>()
-    val longitude = MutableLiveData<Double>()
-
-
+    val reminderTitle = MutableLiveData<String?>()
+    val reminderDescription = MutableLiveData<String?>()
+    val reminderSelectedLocationStr = MutableLiveData<String?>()
+    val selectedPOI = MutableLiveData<PointOfInterest?>()
+    val latitude = MutableLiveData<Double?>()
+    val longitude = MutableLiveData<Double?>()
 
     /**
      * Clear the live data objects to start fresh next time the view model gets called
@@ -43,6 +43,7 @@ class SaveReminderViewModel(val app: Application, val dataSource: ReminderDataSo
      */
     fun validateAndSaveReminder(reminderData: ReminderDataItem) {
         if (validateEnteredData(reminderData)) {
+            geoFenceHelper.addGeoFence(reminderData.latitude!!.toDouble(),reminderData.longitude!!.toDouble(), placeId = reminderData.id)
             saveReminder(reminderData)
         }
     }
@@ -84,6 +85,22 @@ class SaveReminderViewModel(val app: Application, val dataSource: ReminderDataSo
             return false
         }
         return true
+    }
+
+    fun getDataItem(reminderItem: ReminderDataItem) {
+val latLng = LatLng(reminderItem.latitude!!, reminderItem.longitude!!)
+Timber.e(reminderItem.location)
+        selectedPOI.value =PointOfInterest(latLng, reminderItem.id.toString(),
+            reminderItem.location.toString()
+        )
+
+        reminderTitle.value = reminderItem.title
+                  reminderDescription.value = reminderItem.description
+                  reminderSelectedLocationStr.value = reminderItem.location
+                  latitude.value = reminderItem.latitude
+                  longitude.value = reminderItem.longitude
+
+
     }
 
 

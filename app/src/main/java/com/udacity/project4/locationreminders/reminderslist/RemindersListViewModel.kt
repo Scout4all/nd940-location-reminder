@@ -7,16 +7,22 @@ import com.udacity.project4.base.BaseViewModel
 import com.udacity.project4.locationreminders.data.ReminderDataSource
 import com.udacity.project4.locationreminders.data.dto.ReminderDTO
 import com.udacity.project4.locationreminders.data.dto.Result
+import com.udacity.project4.locationreminders.savereminder.selectreminderlocation.GeoFenceHelper
 import kotlinx.coroutines.launch
+import org.koin.java.KoinJavaComponent.inject
+
+import timber.log.Timber
 
 class RemindersListViewModel(
     app: Application,
-    private val dataSource: ReminderDataSource
+    private val dataSource: ReminderDataSource,
+    private val geoFenceHelper: GeoFenceHelper
 ) : BaseViewModel(app) {
     // list that holds the reminder data to be displayed on the UI
     val remindersList = MutableLiveData<List<ReminderDataItem>>()
-
-    /**
+   private val _loadingState = MutableLiveData<Boolean>(true)
+    val loadingState = _loadingState
+     /**
      * Get all the reminders from the DataSource and add them to the remindersList to be shown on the UI,
      * or show error if any
      */
@@ -26,6 +32,7 @@ class RemindersListViewModel(
             //interacting with the dataSource has to be through a coroutine
             val result = dataSource.getReminders()
             showLoading.postValue(false)
+            _loadingState.postValue(false)
             when (result) {
                 is Result.Success<*> -> {
                     val dataList = ArrayList<ReminderDataItem>()
@@ -51,10 +58,21 @@ class RemindersListViewModel(
         }
     }
 
+      fun deleteItem(id:String){
+          Timber.e("delete item ${id}")
+        viewModelScope.launch {
+        dataSource.getReminder(id)
+
+            geoFenceHelper.removeGeofence(listOf(id))
+            loadReminders()
+        }
+    }
     /**
      * Inform the user that there's not any data if the remindersList is empty
      */
     private fun invalidateShowNoData() {
         showNoData.value = remindersList.value == null || remindersList.value!!.isEmpty()
     }
+
+
 }
