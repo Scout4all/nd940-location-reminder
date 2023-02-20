@@ -65,6 +65,8 @@ abstract class BaseRecyclerViewAdapter<T>(private val callback: ((item: T) -> Un
     @LayoutRes
     abstract fun getLayoutRes(viewType: Int): Int
 
+
+
     open fun getLifecycleOwner(): LifecycleOwner? {
         return null
     }

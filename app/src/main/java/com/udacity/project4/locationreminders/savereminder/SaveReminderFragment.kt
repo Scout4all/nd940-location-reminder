@@ -12,6 +12,7 @@ import com.udacity.project4.base.NavigationCommand
 import com.udacity.project4.databinding.FragmentSaveReminderBinding
 import com.udacity.project4.locationreminders.reminderslist.ReminderDataItem
 import com.udacity.project4.utils.setDisplayHomeAsUpEnabled
+import com.udacity.project4.utils.setTitle
 import org.koin.android.ext.android.inject
 
 class SaveReminderFragment : BaseFragment() {
@@ -33,10 +34,14 @@ class SaveReminderFragment : BaseFragment() {
 
         binding.viewModel = _viewModel
         binding.lifecycleOwner = this
+        //check if there is passed args to make fragment behavior editing reminder
         if(args.dataItem != null){
             args.dataItem?.let { reminderItem->
                  _viewModel.getDataItem(reminderItem)
+                //change fragment title
+                this.setTitle(reminderItem.title.toString())
             }
+
 
         }
 

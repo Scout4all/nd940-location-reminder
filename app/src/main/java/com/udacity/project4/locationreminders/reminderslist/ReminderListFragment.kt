@@ -75,15 +75,17 @@ class ReminderListFragment : BaseFragment() {
 
     private fun setupRecyclerView() {
         val adapter = RemindersListAdapter {
-
-            val intent = ReminderDescriptionActivity.newIntent(requireActivity(), it)
-            startActivity(intent)
+//            val intent = ReminderDescriptionActivity.newIntent(requireActivity(), it)
+//            startActivity(intent)
+            _viewModel.navigationCommand.postValue(
+                NavigationCommand.To(
+                    ReminderListFragmentDirections.toSaveReminder(it)
+                )
+            )
 
         }
-
 //        setup the recycler view using the extension function
         binding.reminderssRecyclerView.setup(adapter)
-
     }
 
     @Deprecated("Deprecated in Java")

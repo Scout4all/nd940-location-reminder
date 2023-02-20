@@ -2,6 +2,7 @@ package com.udacity.project4
 
 import android.app.Application
 import android.content.Intent
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.udacity.project4.locationreminders.RemindersActivity
@@ -58,12 +59,13 @@ class MyApp : Application()  {
             androidContext(this@MyApp)
             modules(listOf(myModule))
         }
-        isLoggedIn()
+//        isLoggedIn()
 
     }
 
     private fun isLoggedIn(){
-        if (Firebase.auth.currentUser != null) {
+       val auth = FirebaseAuth.getInstance()
+        if (auth.currentUser != null) {
             val intent = Intent(this, RemindersActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
