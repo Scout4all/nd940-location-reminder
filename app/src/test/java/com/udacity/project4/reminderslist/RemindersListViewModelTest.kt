@@ -75,7 +75,7 @@ class RemindersListViewModelTest {
 
     @Test
     fun returnError() {
-        fakeDataSource.setHasErrors()
+        fakeDataSource.setForceError()
         viewModel.loadReminders()
         assertThat(viewModel.showSnackBar.getOrAwaitValue()).isNotEmpty()
     }
