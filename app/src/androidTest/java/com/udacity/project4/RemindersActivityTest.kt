@@ -6,6 +6,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.udacity.project4.locationreminders.data.ReminderDataSource
 import com.udacity.project4.locationreminders.data.local.LocalDB
+import com.udacity.project4.locationreminders.data.local.RemindersDaoTest
 import com.udacity.project4.locationreminders.data.local.RemindersLocalRepository
 import com.udacity.project4.locationreminders.geofence.GeoFenceHelper
 import com.udacity.project4.locationreminders.reminderslist.RemindersListViewModel
@@ -35,6 +36,7 @@ class RemindersActivityTest :
      */
     @Before
     fun init() {
+
         stopKoin()//stop the original app koin
         appContext = getApplicationContext()
         val myModule = module {

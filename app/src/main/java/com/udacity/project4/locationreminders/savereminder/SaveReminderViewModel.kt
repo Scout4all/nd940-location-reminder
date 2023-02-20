@@ -10,12 +10,16 @@ import com.udacity.project4.base.BaseViewModel
 import com.udacity.project4.base.NavigationCommand
 import com.udacity.project4.locationreminders.data.ReminderDataSource
 import com.udacity.project4.locationreminders.data.dto.ReminderDTO
-import com.udacity.project4.locationreminders.reminderslist.ReminderDataItem
 import com.udacity.project4.locationreminders.geofence.GeoFenceHelper
+import com.udacity.project4.locationreminders.reminderslist.ReminderDataItem
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class SaveReminderViewModel(val app: Application, val dataSource: ReminderDataSource, private val geoFenceHelper: GeoFenceHelper) :
+class SaveReminderViewModel(
+    val app: Application,
+    val dataSource: ReminderDataSource,
+    private val geoFenceHelper: GeoFenceHelper
+) :
     BaseViewModel(app) {
 
     val reminderTitle = MutableLiveData<String?>()
@@ -42,7 +46,11 @@ class SaveReminderViewModel(val app: Application, val dataSource: ReminderDataSo
      */
     fun validateAndSaveReminder(reminderData: ReminderDataItem) {
         if (validateEnteredData(reminderData)) {
-            geoFenceHelper.addGeoFence(reminderData.latitude!!.toDouble(),reminderData.longitude!!.toDouble(), placeId = reminderData.id)
+            geoFenceHelper.addGeoFence(
+                reminderData.latitude!!.toDouble(),
+                reminderData.longitude!!.toDouble(),
+                placeId = reminderData.id
+            )
             saveReminder(reminderData)
         }
     }
@@ -86,18 +94,41 @@ class SaveReminderViewModel(val app: Application, val dataSource: ReminderDataSo
         return true
     }
 
-    fun getDataItem(reminderItem: ReminderDataItem) {
-val latLng = LatLng(reminderItem.latitude!!, reminderItem.longitude!!)
-Timber.e(reminderItem.location)
-        selectedPOI.value =PointOfInterest(latLng, reminderItem.id.toString(),
-            reminderItem.location.toString()
-        )
+    fun getDataItem(reminderItem: ReminderDataItem) :Boolean?{
+        var data = false
+        viewModelScope.launch{
+          val dbDataItem =  dataSource.getReminder(reminderItem.id.toString())
 
-        reminderTitle.value = reminderItem.title
-                  reminderDescription.value = reminderItem.description
-                  reminderSelectedLocationStr.value = reminderItem.location
-                  latitude.value = reminderItem.latitude
-                  longitude.value = reminderItem.longitude
+            when(dbDataItem){
+                is com.udacity.project4.locationreminders.data.dto.Result.Success<*> ->{
+
+                    val latLng = LatLng(reminderItem.latitude!!, reminderItem.longitude!!)
+
+                    Timber.e(reminderItem.location)
+                    selectedPOI.value = PointOfInterest(
+                        latLng, reminderItem.id.toString(),
+                        reminderItem.location.toString()
+                    )
+
+                    reminderTitle.value = reminderItem.title
+                    reminderDescription.value = reminderItem.description
+                    reminderSelectedLocationStr.value = reminderItem.location
+                    latitude.value = reminderItem.latitude
+                    longitude.value = reminderItem.longitude
+
+                    data = true
+                }
+
+                is com.udacity.project4.locationreminders.data.dto.Result.Error ->{
+                    showToast.value = R.string.err_not_in_db.toString()
+                    navigationCommand.value = NavigationCommand.Back
+
+                }
+            }
+
+        }
+
+return data
 
 
     }

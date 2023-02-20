@@ -12,7 +12,6 @@ import com.google.common.truth.Truth.assertThat
 import com.udacity.project4.data.FakeData
 
 import com.udacity.project4.data.FakeDataSource
-import com.udacity.project4.locationreminders.data.dto.ReminderDTO
 import com.udacity.project4.locationreminders.geofence.GeoFenceHelper
 import com.udacity.project4.locationreminders.reminderslist.RemindersListViewModel
 import com.udacity.project4.utils.getOrAwaitValue
@@ -25,7 +24,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.core.context.GlobalContext.stopKoin
 import org.robolectric.annotation.Config
-import timber.log.Timber
 
 @RunWith(AndroidJUnit4::class)
 @Config(sdk = [Build.VERSION_CODES.Q])
@@ -34,72 +32,102 @@ class RemindersListViewModelTest {
 
     private lateinit var appContext: Application
     private lateinit var geoFenceHelper: GeoFenceHelper
-    private lateinit var remindersListViewModel : RemindersListViewModel
+    private lateinit var viewModel: RemindersListViewModel
     private lateinit var fakeDataSource: FakeDataSource
 
-@get:Rule
-val instantExecutorRule = InstantTaskExecutorRule()
+    @get:Rule
+    val instantExecutorRule = InstantTaskExecutorRule()
 
     @Before
-    fun setUp(){
+    fun setUp() {
         stopKoin()
-      appContext = ApplicationProvider.getApplicationContext()
-         geoFenceHelper = GeoFenceHelper(appContext)
-          fakeDataSource= FakeDataSource()
-        remindersListViewModel = RemindersListViewModel(appContext,fakeDataSource,geoFenceHelper)
+        appContext = ApplicationProvider.getApplicationContext()
+        geoFenceHelper = GeoFenceHelper(appContext)
+        fakeDataSource = FakeDataSource()
+        viewModel = RemindersListViewModel(appContext, fakeDataSource, geoFenceHelper)
 
 
     }
+
     @Test
-    fun loadReminders_getRemindersList() = runBlocking  {
+    fun loadReminders_getRemindersList() = runBlocking {
         //Given
         fakeDataSource.saveReminder(FakeData.reminder1)
         fakeDataSource.saveReminder(FakeData.reminder2)
 
         //when
-        remindersListViewModel.loadReminders()
+        viewModel.loadReminders()
 
         //Then
-        val value = remindersListViewModel.remindersList.getOrAwaitValue()
+        val value = viewModel.remindersList.getOrAwaitValue()
 
         assertThat(value.isEmpty()).isFalse()
         assertThat(value.size).isEqualTo(5)
     }
 
     @Test
-    fun deleteRemider_getRemindersList() = runBlocking  {
+    fun checkLoading() {
+        viewModel.loadReminders()
+        val value = viewModel.showLoading.getOrAwaitValue()
+        assertThat(value).isFalse()
+
+    }
+
+    @Test
+    fun returnError() {
+        fakeDataSource.setHasErrors()
+        viewModel.loadReminders()
+        assertThat(viewModel.showSnackBar.getOrAwaitValue()).isNotEmpty()
+    }
+
+    @Test
+    fun checkIfEmpty() {
+         viewModel.loadReminders()
+        val value= viewModel.showNoData.getOrAwaitValue()
+        assertThat(value).isTrue()
+    }
+
+    @Test
+    fun deleteRemider_getRemindersList() = runBlocking {
         //Given
 
         //when
-        remindersListViewModel.deleteAllReminders()
+        viewModel.deleteAllReminders()
 
         //Then
-        val value = remindersListViewModel.remindersList.getOrAwaitValue()
+        val value = viewModel.remindersList.getOrAwaitValue()
 
         assertThat(value.isEmpty()).isTrue()
     }
 
     @Test
-    fun deketeItem() = runBlocking  {
+    fun deketeItem() = runBlocking {
         //Given
-//        remindersListViewModel = RemindersListViewModel(appContext,fakeDataSource,geoFenceHelper)
-//        val oldSize = fakeDataSource.reminders?.size
-//        //when
-//        remindersListViewModel.deleteItem(reminder1.id)
-//
-//        //Then
-//        val value = remindersListViewModel.remindersList.getOrAwaitValue()
-//
-//
-//        assertThat(value.size).isLessThan(oldSize)
+        fakeDataSource.saveReminder(FakeData.reminder1)
+        fakeDataSource.saveReminder(FakeData.reminder2)
+        fakeDataSource.saveReminder(FakeData.reminder3)
+
+        viewModel.loadReminders()
+
+     val oldSize =   viewModel.remindersList.getOrAwaitValue().size
+        System.out.println("Size Old $oldSize")
+
+        viewModel.deleteItem(FakeData.reminder1.id)
+
+
+        val newSize = viewModel.remindersList.getOrAwaitValue().size
+        System.out.println("Size New $newSize")
+        assertThat(newSize).isLessThan(oldSize)
+
     }
-@Test
-    fun shouldReturnError(){
+
+    @Test
+    fun shouldReturnError() {
         //when
-        remindersListViewModel.loadReminders()
+        viewModel.loadReminders()
 
         //Then
-        val value = remindersListViewModel.remindersList.getOrAwaitValue()
+        val value = viewModel.remindersList.getOrAwaitValue()
         assertThat(value.isEmpty()).isTrue()
     }
 
