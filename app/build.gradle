@@ -36,8 +36,15 @@ android {
         jvmTarget = '1.8'
     }
     testOptions.unitTests {
+
         includeAndroidResources = true
         returnDefaultValues = true
+
+
+    }
+    testOptions{
+        animationsDisabled = true
+
     }
     buildFeatures {
         dataBinding true
@@ -60,6 +67,7 @@ dependencies {
 
     //annotation
     implementation "androidx.annotation:annotation:1.6.0-dev01"
+    implementation 'androidx.test.espresso:espresso-idling-resource:3.5.1'
 
     def nav_version = "2.5.3"
     // Kotlin
@@ -159,8 +167,10 @@ dependencies {
     androidTestImplementation "com.linkedin.dexmaker:dexmaker-mockito:2.28.1"
     androidTestImplementation 'io.insert-koin:koin-test:3.3.3'
 
-
-
+//Testing for google maps
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test:rules:1.0.2'
+    androidTestImplementation 'com.android.support.test.uiautomator:uiautomator-v18:2.1.3'
 
 
 }

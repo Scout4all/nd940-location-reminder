@@ -7,6 +7,6 @@
         app:showAsAction="always" />
     <item
         android:id="@+id/delete_all"
-        android:title="Delete All Notes"
+        android:title="@string/delete_all_notes"
         app:showAsAction="never" />
 </menu>

@@ -8,7 +8,8 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.common.truth.Truth.assertThat
+import com.udacity.project4.utils.MainCoroutineRule
+
 import com.udacity.project4.data.FakeData
 
 import com.udacity.project4.data.FakeDataSource
@@ -16,7 +17,12 @@ import com.udacity.project4.locationreminders.geofence.GeoFenceHelper
 import com.udacity.project4.locationreminders.reminderslist.RemindersListViewModel
 import com.udacity.project4.utils.getOrAwaitValue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.pauseDispatcher
+import kotlinx.coroutines.test.resumeDispatcher
+import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
+import org.hamcrest.CoreMatchers.*
+import org.hamcrest.MatcherAssert.assertThat
 
 import org.junit.Before
 import org.junit.Rule
@@ -38,6 +44,9 @@ class RemindersListViewModelTest {
     @get:Rule
     val instantExecutorRule = InstantTaskExecutorRule()
 
+    @get:Rule
+    val mainCoroutineRule = MainCoroutineRule()
+
     @Before
     fun setUp() {
         stopKoin()
@@ -46,89 +55,94 @@ class RemindersListViewModelTest {
         fakeDataSource = FakeDataSource()
         viewModel = RemindersListViewModel(appContext, fakeDataSource, geoFenceHelper)
 
+        insertReminders()
+    }
+
+    private fun insertReminders() = mainCoroutineRule.runTest {
+        FakeData.remindersDTOList.forEachIndexed { index, reminderDataItem ->
+            fakeDataSource.saveReminder(reminderDataItem)
+        }
+    }
+
+    @Test
+    fun loadReminders_getRemindersList_returnNotEmptyListWithSameDatasourceSizeAndShowLoadingView() =
+        mainCoroutineRule.runBlockingTest {
+            //Given
+
+            mainCoroutineRule.pauseDispatcher()
+            //when
+            viewModel.loadReminders()
+            var showLoading = viewModel.showLoading.getOrAwaitValue()
+
+            //Check if loading is showing
+            assertThat(showLoading, `is`(true))
+
+            mainCoroutineRule.resumeDispatcher()
+            //Then get reminders list
+            val result = viewModel.remindersList.getOrAwaitValue()
+            //check show loading view is gone
+            showLoading = viewModel.showLoading.getOrAwaitValue()
+            assertThat(showLoading, `is`(false))
+//check if result is not empty
+            assertThat(result.isNotEmpty(), `is`(true))
+            assertThat(result.size, `is`(fakeDataSource.reminders?.size))
+        }
+
+    @Test
+    fun checkLoading_returnTrueWhenLoadThenFalse() = mainCoroutineRule.runBlockingTest {
+
+        viewModel.loadReminders()
+        val result = viewModel.showLoading.getOrAwaitValue()
+        assertThat(result, `is`(false))
+
+    }
+
+
+    @Test
+    fun deleteAllRemindersOrReminderListIsEmpty_returnEmptyReminderListAndNoData() =
+        mainCoroutineRule.runBlockingTest {
+
+            //when
+            viewModel.deleteAllReminders()
+
+            //Then
+            val result = viewModel.remindersList.getOrAwaitValue()
+
+            assertThat(result.isEmpty(), `is`(true))
+            assertThat(viewModel.showNoData.getOrAwaitValue(), `is`(true))
+        }
+
+    @Test
+    fun deleteItem_shouldReturnSizeLessThanLoaded() = mainCoroutineRule.runBlockingTest {
+
+        //Given item to delete
+        val itemToDelete = FakeData.remindersDTOList.get(0)
+        //when load reminders
+        viewModel.loadReminders()
+
+        //delete item
+        viewModel.deleteItem(itemToDelete.id)
+        //then
+        //get reminders list  new size
+        val remindersList = viewModel.remindersList.getOrAwaitValue()
+        //check that reminders list not have deleted item
+        assertThat(remindersList, not(hasItem(itemToDelete)))
 
     }
 
     @Test
-    fun loadReminders_getRemindersList() = runBlocking {
+    fun loadReminders_DataSourceError_SnakeBarIsShown() = mainCoroutineRule.runBlockingTest {
         //Given
-        fakeDataSource.saveReminder(FakeData.reminder1)
-        fakeDataSource.saveReminder(FakeData.reminder2)
-
-        //when
-        viewModel.loadReminders()
-
-        //Then
-        val value = viewModel.remindersList.getOrAwaitValue()
-
-        assertThat(value.isEmpty()).isFalse()
-        assertThat(value.size).isEqualTo(5)
-    }
-
-    @Test
-    fun checkLoading() {
-        viewModel.loadReminders()
-        val value = viewModel.showLoading.getOrAwaitValue()
-        assertThat(value).isFalse()
-
-    }
-
-    @Test
-    fun returnError() {
         fakeDataSource.setForceError()
-        viewModel.loadReminders()
-        assertThat(viewModel.showSnackBar.getOrAwaitValue()).isNotEmpty()
-    }
 
-    @Test
-    fun checkIfEmpty() {
-         viewModel.loadReminders()
-        val value= viewModel.showNoData.getOrAwaitValue()
-        assertThat(value).isTrue()
-    }
-
-    @Test
-    fun deleteRemider_getRemindersList() = runBlocking {
-        //Given
-
-        //when
-        viewModel.deleteAllReminders()
-
-        //Then
-        val value = viewModel.remindersList.getOrAwaitValue()
-
-        assertThat(value.isEmpty()).isTrue()
-    }
-
-    @Test
-    fun deketeItem() = runBlocking {
-        //Given
-        fakeDataSource.saveReminder(FakeData.reminder1)
-        fakeDataSource.saveReminder(FakeData.reminder2)
-        fakeDataSource.saveReminder(FakeData.reminder3)
-
-        viewModel.loadReminders()
-
-     val oldSize =   viewModel.remindersList.getOrAwaitValue().size
-        System.out.println("Size Old $oldSize")
-
-        viewModel.deleteItem(FakeData.reminder1.id)
-
-
-        val newSize = viewModel.remindersList.getOrAwaitValue().size
-        System.out.println("Size New $newSize")
-        assertThat(newSize).isLessThan(oldSize)
-
-    }
-
-    @Test
-    fun shouldReturnError() {
         //when
         viewModel.loadReminders()
 
         //Then
-        val value = viewModel.remindersList.getOrAwaitValue()
-        assertThat(value.isEmpty()).isTrue()
+        val result = viewModel.showSnackBar.getOrAwaitValue()
+
+        assertThat(result, `is`("Reminders not Found"))
+
     }
 
 }

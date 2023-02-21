@@ -16,9 +16,11 @@ import com.udacity.project4.locationreminders.data.dto.Result
 import com.udacity.project4.locationreminders.geofence.GeoFenceHelper
 import com.udacity.project4.locationreminders.reminderslist.ReminderDataItem
 import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
+import com.udacity.project4.utils.MainCoroutineRule
 import com.udacity.project4.utils.getOrAwaitValue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -39,6 +41,8 @@ class SaveReminderViewModelTest {
     @get:Rule
     val instantExecutorRule = InstantTaskExecutorRule()
 
+    @get:Rule
+    val mainCoroutineRule = MainCoroutineRule()
     @Before
     fun setUp() {
         //given
@@ -74,7 +78,7 @@ class SaveReminderViewModelTest {
 
 
     @Test
-    fun validateAndSaveReminder_validReminder_validationTrue() = runBlocking {
+    fun validateAndSaveReminder_validReminder_validationTrue() = mainCoroutineRule.runBlockingTest{
         // when save reminder nullable Location
        viewModel.validateAndSaveReminder(FakeData.reminderDataItem1)
         // retrieve data from database
@@ -82,7 +86,7 @@ class SaveReminderViewModelTest {
 
         //Then
         //check  if data saved in database
-        assertThat(repoItem ).isTrue()
+        assertThat(repoItem).isTrue()
 
         //check if navigate back to reminders list screen
         assertThat(viewModel.navigationCommand.getOrAwaitValue()).isEqualTo( NavigationCommand.Back)

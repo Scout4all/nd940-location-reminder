@@ -11,12 +11,12 @@ import android.os.Bundle
 
 import android.view.*
 
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.GoogleMapOptions
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
@@ -84,10 +84,10 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
             _viewModel.longitude.value = poi.latLng.longitude
             _viewModel.selectedPOI.value = poi
             _viewModel.reminderSelectedLocationStr.value = poi.name
-            addCircle(poi.latLng, radius = 50f)
+            addCircle(poi.latLng)
 
             val snackbar =
-                Snackbar.make(binding.root, "Confirm add ${poi.name}", Snackbar.LENGTH_LONG)
+                Snackbar.make(binding.root, "add ${poi.name}", Snackbar.LENGTH_LONG)
             snackbar.setAction("Confirm", {
                 if (_viewModel.reminderTitle.value.isNullOrEmpty()) {
                     _viewModel.reminderTitle.value = poi.name
@@ -112,12 +112,33 @@ private fun addCircle(latLng: LatLng, radius:Float = LOCATION_DEFAULT_RADIUS){
 
 }
     override fun onMapReady(googleMap: GoogleMap) {
+
         mMap = googleMap
         getCurrentLocation(googleMap)
         enableMyLocation(googleMap)
         onLocationSelected(googleMap)
         setMapStyle(googleMap)
+        setOnMapClick(googleMap)
     }
+
+    private fun setOnMapClick(googleMap: GoogleMap) : LatLng?  {
+        googleMap.setOnMapClickListener {
+
+            googleMap.clear()
+            googleMap.addMarker(
+                MarkerOptions()
+                    .position(it)
+                    .title(_viewModel.reminderTitle.value)
+            )
+            addCircle(it)
+
+            return@setOnMapClickListener
+        }
+
+        return null
+
+    }
+
 
 
     @Deprecated("Deprecated in Java")

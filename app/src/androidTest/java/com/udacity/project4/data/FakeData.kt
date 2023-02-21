@@ -57,7 +57,7 @@ object FakeData {
         25.104943,55.168110,
         "ChIJAAAAAAAAAAARfyitG2mPJTc"),
 
-     ReminderDataItem("Say Hi to Frien",
+     ReminderDataItem("Say Hi to Friend",
         "daily friend meeting at evening",null,
         25.104943,55.168110,
         "ChIJAAAAAAAAAAARfyitG2mPJTc"),

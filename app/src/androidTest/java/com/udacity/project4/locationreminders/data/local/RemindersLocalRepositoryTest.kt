@@ -9,10 +9,12 @@ import androidx.test.filters.MediumTest
 import com.udacity.project4.data.FakeData
 import com.udacity.project4.locationreminders.data.dto.ReminderDTO
 import com.udacity.project4.locationreminders.data.dto.Result
+import com.udacity.project4.util.MainCoroutineRule
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.contains
@@ -34,6 +36,8 @@ class RemindersLocalRepositoryTest {
     private lateinit var repository: RemindersLocalRepository
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
+    @get:Rule
+    val mainCoroutineRule = MainCoroutineRule()
 
     @Before
     fun setUp() {
@@ -48,7 +52,7 @@ class RemindersLocalRepositoryTest {
         insertReminders()
 
     }
-    private fun insertReminders() = runBlocking {
+    private fun insertReminders() = mainCoroutineRule.runTest  {
         FakeData.remindersDTOList.forEachIndexed { index, reminderDataItem ->
             //Don't insert first reminder for testing
             if(index != 0) {
@@ -60,7 +64,7 @@ class RemindersLocalRepositoryTest {
     fun closeDb() = database.close()
 
     @Test
-    fun saveReminder_getReminders_ResultSuccessHasInsertedItem() = runBlocking {
+    fun saveReminder_getReminders_ResultSuccessHasInsertedItem() = mainCoroutineRule.runBlockingTest {
         //Given reminder data
      val reminder = FakeData.remindersDTOList.get(0)
 
@@ -79,7 +83,7 @@ class RemindersLocalRepositoryTest {
 
 
     @Test
-    fun getReminderByID_ResultSuccessWithReminderItem() = runBlocking {
+    fun getReminderByID_ResultSuccessWithReminderItem() = mainCoroutineRule.runBlockingTest  {
         //Given reminder
         val reminder = FakeData.remindersDTOList.get(1)
         //When repository get reminder by id
@@ -93,7 +97,7 @@ class RemindersLocalRepositoryTest {
     }
 
     @Test
-    fun getReminderByID_ResultError() = runBlocking {
+    fun getReminderByID_ResultError() = mainCoroutineRule.runBlockingTest  {
         //Given reminder not in database
         val reminder = FakeData.remindersDTOList.get(0)
         //When repository get reminder by id
@@ -108,7 +112,7 @@ class RemindersLocalRepositoryTest {
 
 
     @Test
-    fun deleteReminderByID_ResultSuccessAndReminderNotExistsInDB() = runBlocking {
+    fun deleteReminderByID_ResultSuccessAndReminderNotExistsInDB() = mainCoroutineRule.runBlockingTest  {
         //Given reminder not in database
         val reminder = FakeData.remindersDTOList.get(1)
         //When repository delete reminder by id
@@ -127,7 +131,7 @@ class RemindersLocalRepositoryTest {
 
 
     @Test
-    fun deleteAllReminders_ResultSuccessAndEmptyList() = runBlocking {
+    fun deleteAllReminders_ResultSuccessAndEmptyList() = mainCoroutineRule.runBlockingTest  {
 
         //When repository delete all reminders
         repository.deleteAllReminders()
@@ -145,7 +149,7 @@ class RemindersLocalRepositoryTest {
     }
 
     @Test
-    fun getReminders_ResultSuccessSortedByLocation() = runBlocking {
+    fun getReminders_ResultSuccessSortedByLocation() = mainCoroutineRule.runBlockingTest  {
         //Given shadow list sorted by location
         val remindersListShadow = FakeData.remindersDTOList.subList(1,3).sortedBy { it.location }
         //When load reminders

@@ -20,9 +20,10 @@ class RemindersListViewModel(
     // list that holds the reminder data to be displayed on the UI
     val remindersList = MutableLiveData<List<ReminderDataItem>>()
 
-   private val _loadingState = MutableLiveData(true)
+    private val _loadingState = MutableLiveData(true)
     val loadingState = _loadingState
-     /**
+
+    /**
      * Get all the reminders from the DataSource and add them to the remindersList to be shown on the UI,
      * or show error if any
      */
@@ -58,22 +59,23 @@ class RemindersListViewModel(
         }
     }
 
-      fun deleteItem(id:String){
-          Timber.e("delete item ${id}")
+    fun deleteItem(id: String) {
+        Timber.e("delete item ${id}")
         viewModelScope.launch {
-        dataSource.getReminder(id)
+            dataSource.deleteReminder(id)
             geoFenceHelper.removeGeofence(listOf(id))
             loadReminders()
         }
     }
 
-    fun deleteAllReminders(){
+    fun deleteAllReminders() {
         viewModelScope.launch {
             dataSource.deleteAllReminders()
             geoFenceHelper.removeGeofence()
             loadReminders()
         }
     }
+
     /**
      * Inform the user that there's not any data if the remindersList is empty
      */

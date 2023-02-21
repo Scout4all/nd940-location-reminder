@@ -7,8 +7,11 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.udacity.project4.data.FakeData
 import com.udacity.project4.locationreminders.data.dto.ReminderDTO
+import com.udacity.project4.util.MainCoroutineRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.After
@@ -24,8 +27,12 @@ import org.junit.runner.RunWith
 @SmallTest
 class RemindersDaoTest {
 
-     @get:Rule
+    @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
+
+    @get:Rule
+    val mainCoroutineRule = MainCoroutineRule()
+
     private lateinit var database: RemindersDatabase
 
     @Before
@@ -40,7 +47,7 @@ class RemindersDaoTest {
 
     }
 
-    private fun insertReminders() = runBlockingTest {
+    private fun insertReminders() = mainCoroutineRule.runTest  {
         FakeData.remindersDTOList.forEachIndexed { index, reminderDataItem ->
             database.reminderDao().saveReminder(reminderDataItem)
         }
@@ -51,7 +58,7 @@ class RemindersDaoTest {
 
 
     @Test
-    fun deleteReminderByID_returnNullValueWhenQuery() = runBlockingTest {
+    fun deleteReminderByID_returnNullValueWhenQuery() = mainCoroutineRule.runBlockingTest {
 
         val reminder: ReminderDTO = FakeData.remindersDTOList.get(0)
 
@@ -71,7 +78,7 @@ class RemindersDaoTest {
 
 
     @Test
-    fun insertReminderAndGetById() = runBlockingTest {
+    fun insertReminderAndGetById() = mainCoroutineRule.runBlockingTest {
 
         val reminder = FakeData.remindersDTOList.get(0)
 
@@ -89,7 +96,7 @@ class RemindersDaoTest {
 
 
     @Test
-    fun insertReminderAndDeleteAll_returnEmptyList() = runBlockingTest {
+    fun insertReminderAndDeleteAll_returnEmptyList() = mainCoroutineRule.runBlockingTest {
 
         // WHEN - delete all reminders from the database.
         database.reminderDao().deleteAllReminders()
@@ -104,7 +111,7 @@ class RemindersDaoTest {
 
     @Test
     fun getAllReminders_returnSortedRemindersListByLocation() =
-        runBlockingTest {
+        mainCoroutineRule.runBlockingTest {
 
 
             // WHEN - Get the reminders from database
