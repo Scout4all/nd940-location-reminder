@@ -44,14 +44,6 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     private lateinit var mMap: GoogleMap
 
 
-
-    private val runningQOrLater =
-        android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q
-
-    override fun onStart() {
-        super.onStart()
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
@@ -80,25 +72,33 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
                     .position(poi.latLng)
                     .title(poi.name)
             )
-            _viewModel.latitude.value = poi.latLng.latitude
-            _viewModel.longitude.value = poi.latLng.longitude
-            _viewModel.selectedPOI.value = poi
-            _viewModel.reminderSelectedLocationStr.value = poi.name
-            addCircle(poi.latLng)
+       saveLocation(poi)
 
-            val snackbar =
-                Snackbar.make(binding.root, "add ${poi.name}", Snackbar.LENGTH_LONG)
-            snackbar.setAction("Confirm", {
-                if (_viewModel.reminderTitle.value.isNullOrEmpty()) {
-                    _viewModel.reminderTitle.value = poi.name
-                }
-
-                _viewModel.navigationCommand.value = NavigationCommand.Back
-            })
-            snackbar.show()
         }
 
 
+    }
+
+
+    private fun saveLocation(poi : PointOfInterest){
+
+        _viewModel.latitude.value = poi.latLng.latitude
+        _viewModel.longitude.value = poi.latLng.longitude
+        _viewModel.selectedPOI.value = poi
+        _viewModel.reminderSelectedLocationStr.value = poi.name
+
+        addCircle(poi.latLng)
+
+        val snackbar =
+            Snackbar.make(binding.root, "add ${poi.name} to your reminders", Snackbar.LENGTH_LONG)
+        snackbar.setAction(getString(R.string.confirm_btn)) {
+            if (_viewModel.reminderTitle.value.isNullOrEmpty()) {
+                _viewModel.reminderTitle.value = poi.name
+            }
+
+            _viewModel.navigationCommand.value = NavigationCommand.Back
+        }
+        snackbar.show()
     }
 private fun addCircle(latLng: LatLng, radius:Float = LOCATION_DEFAULT_RADIUS){
     val circleOptions = CircleOptions()
@@ -121,21 +121,27 @@ private fun addCircle(latLng: LatLng, radius:Float = LOCATION_DEFAULT_RADIUS){
         setOnMapClick(googleMap)
     }
 
-    private fun setOnMapClick(googleMap: GoogleMap) : LatLng?  {
-        googleMap.setOnMapClickListener {
+    private fun setOnMapClick(googleMap: GoogleMap)    {
 
+        var pointOfInterest :PointOfInterest?
+            googleMap.setOnMapClickListener {
             googleMap.clear()
             googleMap.addMarker(
                 MarkerOptions()
                     .position(it)
                     .title(_viewModel.reminderTitle.value)
             )
-            addCircle(it)
+                pointOfInterest = PointOfInterest(it,
+                    _viewModel.reminderTitle.value!!,
+                    _viewModel.reminderTitle.value!!
+                )
 
-            return@setOnMapClickListener
+            saveLocation(pointOfInterest!!)
+
+
         }
 
-        return null
+        pointOfInterest = null
 
     }
 

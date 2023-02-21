@@ -2,6 +2,8 @@ package com.udacity.project4
 
 import android.app.Application
 import android.os.Build
+import android.provider.Settings
+import android.provider.Settings.SettingNotFoundException
 import android.view.View
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
@@ -18,6 +20,7 @@ import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.*
+import com.google.android.apps.common.testing.accessibility.framework.replacements.TextUtils
 import com.udacity.project4.data.FakeData
 import com.udacity.project4.locationreminders.RemindersActivity
 import com.udacity.project4.locationreminders.data.ReminderDataSource
@@ -31,7 +34,6 @@ import com.udacity.project4.util.monitorActivity
 import com.udacity.project4.utils.EspressoIdlingResource
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.Matcher
-import org.hamcrest.core.AllOf.allOf
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -43,7 +45,6 @@ import org.koin.core.context.stopKoin
 import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.get
-
 
 
 @RunWith(AndroidJUnit4::class)
@@ -181,75 +182,98 @@ private val device = UiDevice.getInstance(getInstrumentation())
 
     @Test
     fun deleteAllReminders_noDataViewDisplayed() {
-        val reminderData = FakeData.remindersDTOList.get(1)
+
         val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
         dataBindingIdlingResource.monitorActivity(activityScenario)
-        openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext()).run {
+         device.pressMenu()
             onView(withText(R.string.delete_all_notes)).perform(click())
             //check if no data is displayed
             onView(withId(R.id.noDataTextView)).check(matches(isDisplayed()))
-
-        }
-
-
-
         activityScenario.close()
     }
-   private fun handleConstraints(action: ViewAction, constraints: Matcher<View>): ViewAction? {
-        return object : ViewAction {
-            override fun getConstraints(): Matcher<View> {
-                return constraints
-            }
+    @Test
+    fun openAppWhileNoLocationService_enableLocationFromAppAndSaveReminder(){
+        locationHelper()
+        val reminderData = FakeData.remindersDTOList.get(0)
 
-            override fun getDescription(): String {
-                return action.description
-            }
+        val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
+        dataBindingIdlingResource.monitorActivity(activityScenario)
+        val allowGpsBtn = device.findObject(
+            UiSelector()
+                .className("android.widget.Button").packageName("com.google.android.gms")
+                .resourceId("android:id/button1")
+                .clickable(true).checkable(false)
+        )
+        device.pressDelete() // just in case to turn ON blur screen (not a wake up) for some devices like HTC and some other
 
-            override fun perform(uiController: UiController?, view: View?) {
-                action.perform(uiController, view)
-            }
+        if (allowGpsBtn.exists() && allowGpsBtn.isEnabled) {
+            do {
+                allowGpsBtn.click()
+            } while (allowGpsBtn.exists())
         }
+
+        dataBindingIdlingResource.monitorActivity(activityScenario)
+        onView(withId(R.id.addReminderFAB)).perform(click())
+
+
+        onView(withId(R.id.reminderTitle)).perform(typeText(reminderData.title))
+        onView(withId(R.id.reminderDescription)).perform(typeText(reminderData.description))
+        Espresso.closeSoftKeyboard()
+
+        onView(withId(R.id.selectLocation)).perform(click())
+        onView(withId(R.id.map)).perform(click())
+
+        device.waitForIdle(5000)
+
+        onView(withText("Confirm")).perform(click())
+
+        onView(withId(R.id.saveReminder)).perform(click())
+//check if reminder is added
+        onView(withText(reminderData.title)).check(matches(isDisplayed()))
+
+        activityScenario.close()
+        resetLocation()
     }
-    private fun grantPermission() {
-        val instrumentation = getInstrumentation()
-        if (Build.VERSION.SDK_INT >= 23) {
-            val allowPermission = UiDevice.getInstance(instrumentation).findObject(
-                UiSelector().text(
-                    when {
-                        Build.VERSION.SDK_INT == 23 -> "Allow"
-                        Build.VERSION.SDK_INT <= 28 -> "ALLOW"
-                        Build.VERSION.SDK_INT == 29 -> "Allow only while using the app"
-                        else -> "Only this time"
-                    }
-                )
-            )
-            if (allowPermission.exists()) {
-                allowPermission.click()
-            }
-        }
-    }
-
-    fun deviceHelper(){
 
 
+    private fun locationHelper(){
+    if(isLocationEnabled()){
         device.openQuickSettings()
-//        device.findObject(
-//            UiSelector().textContains("Location").className(
-//                ViewGroup::class.java
-//            )
-//        ).click()
-
-// Set location by setting the latitude, longitude and may be the altitude...
-        // Set location by setting the latitude, longitude and may be the altitude...
-//        val MockLoc: Array<String> = str.split(",")
-//        val location = Location(mocLocationProvider)
-//        val lat = java.lang.Double.valueOf(MockLoc[0])
-//        location.setLatitude(lat)
-//        val longi = java.lang.Double.valueOf(MockLoc[1])
-//        location.setLongitude(longi)
-//        val alti = java.lang.Double.valueOf(MockLoc[2])
-//        location.setAltitude(alti)
+      val notification=   device.findObject(UiSelector().textContains("Location"))
+                 notification.click()
+        device.pressHome()
+             }
+    }
 
 
+   private fun resetLocation(){
+        if(!isLocationEnabled()){
+
+            device.openQuickSettings()
+            val notification=   device.findObject(UiSelector().textContains("Location"))
+
+            notification.click()
+            device.pressHome()
+        }
+    }
+
+   private fun isLocationEnabled(): Boolean {
+        var locationMode = 0
+        val locationProviders: String
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            locationMode = try {
+                Settings.Secure.getInt(appContext.getContentResolver(), Settings.Secure.LOCATION_MODE)
+            } catch (e: SettingNotFoundException) {
+                e.printStackTrace()
+                return false
+            }
+            locationMode != Settings.Secure.LOCATION_MODE_OFF
+        } else {
+            locationProviders = Settings.Secure.getString(
+                appContext.getContentResolver(),
+                Settings.Secure.LOCATION_PROVIDERS_ALLOWED
+            )
+            !TextUtils.isEmpty(locationProviders)
+        }
     }
 }

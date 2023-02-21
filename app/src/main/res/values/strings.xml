@@ -43,4 +43,5 @@
     <string name="application_logo">Application Logo</string>
     <string name="err_not_in_db">Reminder not exists in database</string>
     <string name="delete_all_notes">Delete All Notes</string>
+    <string name="confirm_btn">Confirm</string>
 </resources>

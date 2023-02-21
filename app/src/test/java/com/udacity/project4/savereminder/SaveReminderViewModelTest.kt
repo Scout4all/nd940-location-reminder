@@ -77,21 +77,5 @@ class SaveReminderViewModelTest {
     }
 
 
-    @Test
-    fun validateAndSaveReminder_validReminder_validationTrue() = mainCoroutineRule.runBlockingTest{
-        // when save reminder nullable Location
-       viewModel.validateAndSaveReminder(FakeData.reminderDataItem1)
-        // retrieve data from database
-        val repoItem=  viewModel.getDataItem(FakeData.reminderDataItem1)
-
-        //Then
-        //check  if data saved in database
-        assertThat(repoItem).isTrue()
-
-        //check if navigate back to reminders list screen
-        assertThat(viewModel.navigationCommand.getOrAwaitValue()).isEqualTo( NavigationCommand.Back)
-    }
-
-
 
 }

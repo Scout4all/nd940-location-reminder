@@ -94,41 +94,24 @@ class SaveReminderViewModel(
         return true
     }
 
-    fun getDataItem(reminderItem: ReminderDataItem) :Boolean?{
-        var data = false
-        viewModelScope.launch{
-          val dbDataItem =  dataSource.getReminder(reminderItem.id.toString())
+    fun getDataItem(reminderItem: ReminderDataItem) {
 
-            when(dbDataItem){
-                is com.udacity.project4.locationreminders.data.dto.Result.Success<*> ->{
+        val latLng = LatLng(reminderItem.latitude!!, reminderItem.longitude!!)
 
-                    val latLng = LatLng(reminderItem.latitude!!, reminderItem.longitude!!)
+        Timber.e(reminderItem.location)
 
-                    Timber.e(reminderItem.location)
-                    selectedPOI.value = PointOfInterest(
-                        latLng, reminderItem.id.toString(),
-                        reminderItem.location.toString()
-                    )
-
-                    reminderTitle.value = reminderItem.title
-                    reminderDescription.value = reminderItem.description
-                    reminderSelectedLocationStr.value = reminderItem.location
-                    latitude.value = reminderItem.latitude
-                    longitude.value = reminderItem.longitude
-
-                    data = true
-                }
-
-                is com.udacity.project4.locationreminders.data.dto.Result.Error ->{
-                    showToast.value = R.string.err_not_in_db.toString()
-                    navigationCommand.value = NavigationCommand.Back
-
-                }
-            }
-
+        reminderTitle.value = reminderItem.title
+        reminderDescription.value = reminderItem.description
+        if (reminderSelectedLocationStr.value.isNullOrEmpty()) {
+            reminderSelectedLocationStr.value = reminderItem.location
+            latitude.value = reminderItem.latitude
+            longitude.value = reminderItem.longitude
+            selectedPOI.value = PointOfInterest(
+                latLng,
+                reminderItem.id.toString(),
+                reminderItem.location.toString()
+            )
         }
-
-return data
 
 
     }

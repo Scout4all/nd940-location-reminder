@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.navArgs
 import com.udacity.project4.R
 import com.udacity.project4.base.BaseFragment
@@ -40,6 +41,8 @@ class SaveReminderFragment : BaseFragment() {
                  _viewModel.getDataItem(reminderItem)
                 //change fragment title
                 this.setTitle(reminderItem.title.toString())
+              binding.selectLocation.isClickable = false
+                binding.selectLocation.isEnabled =false
             }
 
 
@@ -52,14 +55,19 @@ class SaveReminderFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = this
 
-        if(args.dataItem != null) {
-            binding.selectLocation.isClickable = false
-            binding.selectLocation.isEnabled =false
-        }
         binding.selectLocation.setOnClickListener {
             //            Navigate to another fragment to get the user location
-            _viewModel.navigationCommand.value =
-                NavigationCommand.To(SaveReminderFragmentDirections.actionSaveReminderFragmentToSelectLocationFragment())
+
+
+                if(!_viewModel.reminderTitle.value.isNullOrEmpty()) {
+                    _viewModel.navigationCommand.value =
+                        NavigationCommand.To(SaveReminderFragmentDirections.actionSaveReminderFragmentToSelectLocationFragment())
+                }else{
+                    _viewModel.showSnackBarInt.value = R.string.err_enter_title
+
+                }
+
+
         }
 
         binding.saveReminder.setOnClickListener {
@@ -73,6 +81,7 @@ class SaveReminderFragment : BaseFragment() {
              val reminderDataItem = ReminderDataItem(title,description,location,latitude,longitude,placeId)
             _viewModel.validateAndSaveReminder( reminderDataItem)
         }
+
     }
 
     override fun onDestroy() {
