@@ -54,16 +54,19 @@ class AuthenticationActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        //check if user logged in move him to Reminders activity
+        //check if user logged in  when activity send results then move to to Reminders activity when login
         checkLogin()
     }
 
     override fun onStart() {
         super.onStart()
+        //check if user logged in then move to to Reminders activity
+
         checkLogin()
     }
 
     private fun checkLogin() {
+        //FirebaseUserLiveData didn't work here :\ so i have done next :(
         Firebase.initialize(this@AuthenticationActivity)
         val auth = FirebaseAuth.getInstance()
         if (auth.currentUser != null) {
@@ -86,8 +89,8 @@ class AuthenticationActivity : AppCompatActivity() {
             .setLogo(R.mipmap.ic_launcher_round)
             .setTheme(R.style.AppTheme)
             .setTosAndPrivacyPolicyUrls(
-                "https://example.com/terms.html",
-                "https://example.com/privacy.html"
+                "https://bigad.me",
+                "https://bigad.me"
             )
             .build()
 

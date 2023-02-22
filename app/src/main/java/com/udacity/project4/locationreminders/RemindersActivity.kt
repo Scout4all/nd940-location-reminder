@@ -42,6 +42,8 @@ class RemindersActivity : AppCompatActivity() {
     private lateinit var binding: ActivityRemindersBinding
     private lateinit var navHostFragment: NavHostFragment
 
+    val runningQOrLater = android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q
+
     //private lateinit var navController : NavController
     lateinit var appBarConfiguration: AppBarConfiguration
 
@@ -99,7 +101,6 @@ class RemindersActivity : AppCompatActivity() {
         }
     }
 
-    val runningQOrLater = android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q
 
     @TargetApi(29)
     private fun foregroundAndBackgroundLocationPermissionApproved(): Boolean {
@@ -143,15 +144,13 @@ class RemindersActivity : AppCompatActivity() {
             } else {
                 Snackbar.make(
                     binding.root,
-                    R.string.location_required_error, Snackbar.LENGTH_INDEFINITE
+                    R.string.location_required_error, Snackbar.LENGTH_LONG
                 ).setAction(android.R.string.ok) {
                     checkDeviceLocationSettingsAndStartGeofence()
                 }.show()
             }
         }
-        locationSettingsResponseTask.addOnCompleteListener {
 
-        }
     }
 
     @TargetApi(29)
@@ -190,8 +189,7 @@ class RemindersActivity : AppCompatActivity() {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        // TODO: Step 5 add code to handle the result of the user's permission
-        Timber.d("onRequestPermissionResult")
+         Timber.d("onRequestPermissionResult")
 
         if (
             grantResults.isEmpty() ||

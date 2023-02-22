@@ -38,6 +38,8 @@ abstract class BaseFragment : Fragment() {
         _viewModel.showSnackBarInt.observe(this, Observer {
             Snackbar.make(this.view!!, getString(it), Snackbar.LENGTH_LONG).show()
         })
+
+        //added by me to handle actions
         _viewModel.showSnackBarAction.observe(this, Observer {
             Snackbar.make(this.view!!, it, Snackbar.LENGTH_LONG)
                 .setAction(getString(R.string.confirm_btn)) {

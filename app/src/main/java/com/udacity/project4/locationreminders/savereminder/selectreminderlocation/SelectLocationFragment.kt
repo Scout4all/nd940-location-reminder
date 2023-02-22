@@ -103,6 +103,8 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
             googleMap.addMarker(
                 MarkerOptions().position(latLng).title(binding.hy.text.toString())
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+
             )
             addCircle(latLng)
 
@@ -169,20 +171,9 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     }
 
 
-//    @SuppressLint("MissingPermission")
-//    private fun enableMyLocation(map: GoogleMap) {
-//        if (isPermissionGranted()) {
-//            map.isMyLocationEnabled = true
-//
-//        }
-//    }
-
-
     @SuppressLint("MissingPermission")
     private fun getCurrentLocation(map: GoogleMap) {
         var lastKnownLocation: Location?
-
-//        val defaultLocation = LatLng(-33.8523341, 151.2106085)
 
         val fusedLocationProviderClient: FusedLocationProviderClient =
             LocationServices.getFusedLocationProviderClient(requireActivity())
