@@ -2,6 +2,7 @@ package com.udacity.project4.base
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageButton
 import androidx.annotation.LayoutRes
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
@@ -38,8 +39,6 @@ abstract class BaseRecyclerViewAdapter<T>(private val callback: ((item: T) -> Un
         holder.itemView.setOnClickListener {
             callback?.invoke(item)
         }
-
-
     }
 
     fun getItem(position: Int) = _items[position]

@@ -69,15 +69,15 @@ class GeoFenceHelper(base: Application?) : ContextWrapper(base) {
             .build()
     }
 
-    fun removeGeofence(geofenceID: List<String> = emptyList()) {
-        if (geofenceID.isEmpty()) {
+    fun removeGeofence(geofenceID:  String? = null ) {
+        if (geofenceID.isNullOrEmpty()) {
             geofencingClient.removeGeofences(geofenceIntent).run {
                 addOnFailureListener {
                     Timber.d("e ${it.localizedMessage}")
                 }
             }
         } else {
-            geofencingClient.removeGeofences(geofenceID).run {
+            geofencingClient.removeGeofences(listOf(geofenceID)).run {
                 addOnFailureListener {
                     Timber.d("e ${it.localizedMessage}")
                 }

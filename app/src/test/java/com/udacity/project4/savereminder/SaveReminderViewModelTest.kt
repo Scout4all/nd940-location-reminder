@@ -7,6 +7,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import com.google.firebase.FirebaseApp
 import com.udacity.project4.R
 import com.udacity.project4.base.NavigationCommand
 import com.udacity.project4.data.FakeData
@@ -26,12 +27,13 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.core.context.GlobalContext
+import org.koin.core.context.GlobalContext.stopKoin
 import org.robolectric.annotation.Config
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 @Config(sdk = [Build.VERSION_CODES.Q])
-class SaveReminderViewModelTest {
+class SaveReminderViewModelTest  {
 
     private lateinit var appContext: Application
     private lateinit var geoFenceHelper: GeoFenceHelper
@@ -46,9 +48,10 @@ class SaveReminderViewModelTest {
     @Before
     fun setUp() {
         //given
-        GlobalContext.stopKoin()
+       stopKoin()
         appContext = ApplicationProvider.getApplicationContext()
         geoFenceHelper = GeoFenceHelper(appContext)
+
         fakeDataSource = FakeDataSource()
         viewModel = SaveReminderViewModel(appContext, fakeDataSource, geoFenceHelper)
     }

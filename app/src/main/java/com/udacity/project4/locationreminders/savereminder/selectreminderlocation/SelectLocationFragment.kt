@@ -8,15 +8,12 @@ import android.content.res.Resources
 import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
-
 import android.view.*
-
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.GoogleMapOptions
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
@@ -32,6 +29,7 @@ import com.udacity.project4.utils.LOCATION_DEFAULT_RADIUS
 import com.udacity.project4.utils.setDisplayHomeAsUpEnabled
 import org.koin.android.ext.android.inject
 import timber.log.Timber
+import java.util.*
 
 
 class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
@@ -43,6 +41,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     private lateinit var binding: FragmentSelectLocationBinding
     private lateinit var mMap: GoogleMap
 
+    val DEFAULT_LOCATION_LATLNG =LatLng(37.4220658,-122.0840907)
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -57,30 +56,16 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         setDisplayHomeAsUpEnabled(true)
 
         mMapFragment = (childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?)!!
-        mMapFragment.getMapAsync(this);
+        mMapFragment.getMapAsync(this)
 
         return binding.root
     }
 
 
-    private fun onLocationSelected(map: GoogleMap) {
-
-        map.setOnPoiClickListener { poi ->
-            map.clear()
-            map.addMarker(
-                MarkerOptions()
-                    .position(poi.latLng)
-                    .title(poi.name)
-            )
-       saveLocation(poi)
-
-        }
 
 
-    }
 
-
-    private fun saveLocation(poi : PointOfInterest){
+    private fun saveLocation(poi: PointOfInterest) {
 
         _viewModel.latitude.value = poi.latLng.latitude
         _viewModel.longitude.value = poi.latLng.longitude
@@ -90,62 +75,67 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         addCircle(poi.latLng)
 
         val snackbar =
-            Snackbar.make(binding.root, "add ${poi.name} to your reminders", Snackbar.LENGTH_LONG)
+            Snackbar.make(binding.root, "Add ${poi.name} as location to your reminder", Snackbar.LENGTH_LONG)
         snackbar.setAction(getString(R.string.confirm_btn)) {
-            if (_viewModel.reminderTitle.value.isNullOrEmpty()) {
-                _viewModel.reminderTitle.value = poi.name
-            }
+
 
             _viewModel.navigationCommand.value = NavigationCommand.Back
         }
         snackbar.show()
     }
-private fun addCircle(latLng: LatLng, radius:Float = LOCATION_DEFAULT_RADIUS){
-    val circleOptions = CircleOptions()
-    circleOptions.radius( radius.toDouble())
-    circleOptions.center(latLng)
-    circleOptions.strokeColor(Color.argb(255,255,0,0))
-    circleOptions.fillColor(Color.argb(64,255,0,0))
-    circleOptions.strokeWidth(4f)
-    mMap.addCircle(circleOptions)
 
 
-}
+
     override fun onMapReady(googleMap: GoogleMap) {
-
         mMap = googleMap
         getCurrentLocation(googleMap)
-        enableMyLocation(googleMap)
+//        enableMyLocation(googleMap)
+        getCurrentLocation(googleMap)
         onLocationSelected(googleMap)
         setMapStyle(googleMap)
         setOnMapClick(googleMap)
     }
 
-    private fun setOnMapClick(googleMap: GoogleMap)    {
+    private fun onLocationSelected(map: GoogleMap) {
 
-        var pointOfInterest :PointOfInterest?
-            googleMap.setOnMapClickListener {
+        map.setOnPoiClickListener { poi ->
+            map.clear()
+            map.addMarker(
+                MarkerOptions().position(poi.latLng).title(poi.name)
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+
+            )
+            saveLocation(poi)
+        }
+    }
+    private fun setOnMapClick(googleMap: GoogleMap) {
+        googleMap.setOnMapClickListener {
             googleMap.clear()
             googleMap.addMarker(
-                MarkerOptions()
-                    .position(it)
-                    .title(_viewModel.reminderTitle.value)
+                MarkerOptions().position(it).title(_viewModel.reminderTitle.value)
             )
-                pointOfInterest = PointOfInterest(it,
-                    _viewModel.reminderTitle.value!!,
-                    _viewModel.reminderTitle.value!!
-                )
-
-            saveLocation(pointOfInterest!!)
-
+            val pointOfInterest = PointOfInterest(
+                it, UUID.randomUUID().toString(), _viewModel.reminderTitle.value!!
+            )
+            saveLocation(pointOfInterest)
 
         }
 
-        pointOfInterest = null
 
     }
 
 
+    private fun addCircle(latLng: LatLng, radius: Float = LOCATION_DEFAULT_RADIUS) {
+        val circleOptions = CircleOptions()
+        circleOptions.radius(radius.toDouble())
+        circleOptions.center(latLng)
+        circleOptions.strokeColor(Color.argb(255, 0, 255, 0))
+        circleOptions.fillColor(Color.argb(64, 0, 255, 0))
+        circleOptions.strokeWidth(4f)
+        mMap.addCircle(circleOptions)
+
+
+    }
 
     @Deprecated("Deprecated in Java")
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -154,7 +144,6 @@ private fun addCircle(latLng: LatLng, radius:Float = LOCATION_DEFAULT_RADIUS){
 
     @Deprecated("Deprecated in Java")
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-        // TODO: Change the map type based on the user's selection.
         R.id.normal_map -> {
             mMap.mapType = GoogleMap.MAP_TYPE_NORMAL
             true
@@ -180,37 +169,33 @@ private fun addCircle(latLng: LatLng, radius:Float = LOCATION_DEFAULT_RADIUS){
     @Suppress("DEPRECATED_IDENTITY_EQUALS")
     private fun isPermissionGranted(): Boolean {
         return ContextCompat.checkSelfPermission(
-            requireContext(),
-            Manifest.permission.ACCESS_FINE_LOCATION
+            requireContext(), Manifest.permission.ACCESS_FINE_LOCATION
         ) === PackageManager.PERMISSION_GRANTED
 
     }
 
 
-
-    @SuppressLint("MissingPermission")
-    private fun enableMyLocation(map : GoogleMap) {
-        if (isPermissionGranted()) {
-            map.setMyLocationEnabled(true)
-            getCurrentLocation(map)
-        }
-    }
-
-
+//    @SuppressLint("MissingPermission")
+//    private fun enableMyLocation(map: GoogleMap) {
+//        if (isPermissionGranted()) {
+//            map.isMyLocationEnabled = true
+//
+//        }
+//    }
 
 
     @SuppressLint("MissingPermission")
-    private fun getCurrentLocation(map : GoogleMap) {
+    private fun getCurrentLocation(map: GoogleMap) {
         var lastKnownLocation: Location?
 
-
-        val defaultLocation = LatLng(-33.8523341, 151.2106085)
+//        val defaultLocation = LatLng(-33.8523341, 151.2106085)
 
         val fusedLocationProviderClient: FusedLocationProviderClient =
             LocationServices.getFusedLocationProviderClient(requireActivity())
         try {
             if (isPermissionGranted()) {
-                val locationResult: Task<Location> = fusedLocationProviderClient.getLastLocation()
+                map.isMyLocationEnabled = true
+                val locationResult: Task<Location> = fusedLocationProviderClient.lastLocation
                 locationResult.addOnCompleteListener(requireActivity()) { task ->
                     if (task.isSuccessful) {
                         // Set the map's camera position to the current location of the device.
@@ -219,8 +204,7 @@ private fun addCircle(latLng: LatLng, radius:Float = LOCATION_DEFAULT_RADIUS){
                             map.moveCamera(
                                 CameraUpdateFactory.newLatLngZoom(
                                     LatLng(
-                                        lastKnownLocation!!.latitude,
-                                        lastKnownLocation!!.longitude
+                                        lastKnownLocation!!.latitude, lastKnownLocation!!.longitude
                                     ), DEFAULT_ZOOM
                                 )
                             )
@@ -229,8 +213,7 @@ private fun addCircle(latLng: LatLng, radius:Float = LOCATION_DEFAULT_RADIUS){
                         Timber.d("Current location is null. Using defaults.")
                         Timber.e("Exception: %s", task.exception)
                         map.moveCamera(
-                            CameraUpdateFactory
-                                .newLatLngZoom(defaultLocation, DEFAULT_ZOOM)
+                            CameraUpdateFactory.newLatLngZoom(DEFAULT_LOCATION_LATLNG, DEFAULT_ZOOM)
                         )
                         map.uiSettings.isMyLocationButtonEnabled = false
                     }
@@ -241,14 +224,19 @@ private fun addCircle(latLng: LatLng, radius:Float = LOCATION_DEFAULT_RADIUS){
         }
     }
 
-private fun setMapStyle(map: GoogleMap){
-    try{
-        val success = map.setMapStyle(MapStyleOptions.loadRawResourceStyle(requireContext(),R.raw.map_style))
-        if(!success){
-            Timber.d("Style Parsing failed ")
+    private fun setMapStyle(map: GoogleMap) {
+        try {
+            val success = map.setMapStyle(
+                MapStyleOptions.loadRawResourceStyle(
+                    requireContext(),
+                    R.raw.map_style
+                )
+            )
+            if (!success) {
+                Timber.d("Style Parsing failed ")
+            }
+        } catch (e: Resources.NotFoundException) {
+            Timber.e(e.message)
         }
-    }catch (e : Resources.NotFoundException){
-        Timber.e(e.message)
     }
-}
 }

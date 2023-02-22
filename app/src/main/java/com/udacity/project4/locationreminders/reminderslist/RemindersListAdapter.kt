@@ -3,6 +3,7 @@ package com.udacity.project4.locationreminders.reminderslist
 import android.view.View
 import com.udacity.project4.R
 import com.udacity.project4.base.BaseRecyclerViewAdapter
+import com.udacity.project4.base.DataBindingViewHolder
 
 
 //Use data binding to show the reminder on the item
@@ -11,6 +12,7 @@ class RemindersListAdapter(   callBack: (selectedReminder: ReminderDataItem) -> 
     override fun getLayoutRes(viewType: Int): Int {
         return R.layout.it_reminder
     }
+
 
 
 

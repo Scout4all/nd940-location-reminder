@@ -10,8 +10,7 @@ import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.*
 import androidx.test.espresso.IdlingRegistry
-import androidx.test.espresso.UiController
-import androidx.test.espresso.ViewAction
+
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
@@ -22,6 +21,7 @@ import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.*
 import com.google.android.apps.common.testing.accessibility.framework.replacements.TextUtils
 import com.udacity.project4.data.FakeData
+import com.udacity.project4.locationreminders.ReminderDescriptionViewModel
 import com.udacity.project4.locationreminders.RemindersActivity
 import com.udacity.project4.locationreminders.data.ReminderDataSource
 import com.udacity.project4.locationreminders.data.local.LocalDB
@@ -33,8 +33,7 @@ import com.udacity.project4.util.DataBindingIdlingResource
 import com.udacity.project4.util.monitorActivity
 import com.udacity.project4.utils.EspressoIdlingResource
 import kotlinx.coroutines.runBlocking
-import org.hamcrest.Matcher
-import org.junit.After
+ import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -59,18 +58,20 @@ private val device = UiDevice.getInstance(getInstrumentation())
     private lateinit var repository: ReminderDataSource
     private lateinit var appContext: Application
 
+//Grant location Permission before test
     @get:Rule
     val permissionRule = GrantPermissionRule.grant(
         android.Manifest.permission.ACCESS_FINE_LOCATION,
         android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
     )
+
+
     /**
      * As we use Koin as a Service Locator Library to develop our code, we'll also use Koin to test our code.
      * at this step we will initialize Koin related code to be able to use it in out testing.
      */
     @Before
     fun init() {
-
         stopKoin()//stop the original app koin
         appContext = getApplicationContext()
         val myModule = module {
@@ -83,6 +84,13 @@ private val device = UiDevice.getInstance(getInstrumentation())
             }
             single {
                 SaveReminderViewModel(
+                    appContext,
+                    get() as ReminderDataSource ,
+                    get()
+                )
+            }
+            single {
+                ReminderDescriptionViewModel(
                     appContext,
                     get() as ReminderDataSource ,
                     get()
@@ -114,6 +122,12 @@ private val device = UiDevice.getInstance(getInstrumentation())
         }
     }
 
+    //clean database after finish test
+    @After
+        fun resetDatabase() = runBlocking{
+        repository.deleteAllReminders()
+    }
+
     private val dataBindingIdlingResource = DataBindingIdlingResource()
 
     @Before
@@ -127,8 +141,40 @@ private val device = UiDevice.getInstance(getInstrumentation())
         unregister(EspressoIdlingResource.countingIdlingResource)
         unregister(dataBindingIdlingResource)
     }
+    @Test
+    fun addReminderTest_withInputErrors_ResultShowToastSnakeBar() {
+        val reminderData = FakeData.remindersDTOList.get(0)
+        val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
+        dataBindingIdlingResource.monitorActivity(activityScenario)
+        onView(withId(R.id.addReminderFAB)).perform(click())
 
-//    TODO: add End to End testing to the app
+        //check empty title save button
+        onView(withId(R.id.saveReminder)).perform(click())
+        onView(withText(R.string.err_enter_title)).check(matches(isDisplayed()))
+
+//check select location with empty title
+        onView(withId(R.id.selectLocation)).perform(click())
+        onView(withText(R.string.err_enter_title)).check(matches(isDisplayed()))
+
+        onView(withId(R.id.reminderTitle)).perform(typeText(reminderData.title))
+        onView(withId(R.id.reminderDescription)).perform(typeText(reminderData.description))
+        Espresso.closeSoftKeyboard()
+
+        onView(withId(R.id.selectLocation)).perform(click())
+
+        onView(withId(R.id.map)).perform(click())
+
+        device.waitForIdle(5000)
+
+        onView(withText("Confirm")).perform(click())
+
+        onView(withId(R.id.saveReminder)).perform(click())
+
+        //check if reminder is added
+        onView(withText(reminderData.title)).check(matches(isDisplayed()))
+
+        activityScenario.close()
+    }
 
     @Test
     fun addReminderTest_ResultReminderAddedToRemindersList() {
@@ -136,7 +182,6 @@ private val device = UiDevice.getInstance(getInstrumentation())
         val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
         dataBindingIdlingResource.monitorActivity(activityScenario)
         onView(withId(R.id.addReminderFAB)).perform(click())
-
 
         onView(withId(R.id.reminderTitle)).perform(typeText(reminderData.title))
         onView(withId(R.id.reminderDescription)).perform(typeText(reminderData.description))
@@ -150,7 +195,8 @@ private val device = UiDevice.getInstance(getInstrumentation())
            onView(withText("Confirm")).perform(click())
 
         onView(withId(R.id.saveReminder)).perform(click())
-//check if reminder is added
+
+        //check if reminder is added
         onView(withText(reminderData.title)).check(matches(isDisplayed()))
 
         activityScenario.close()
@@ -262,7 +308,7 @@ private val device = UiDevice.getInstance(getInstrumentation())
         val locationProviders: String
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             locationMode = try {
-                Settings.Secure.getInt(appContext.getContentResolver(), Settings.Secure.LOCATION_MODE)
+                Settings.Secure.getInt(appContext.contentResolver, Settings.Secure.LOCATION_MODE)
             } catch (e: SettingNotFoundException) {
                 e.printStackTrace()
                 return false
@@ -270,7 +316,7 @@ private val device = UiDevice.getInstance(getInstrumentation())
             locationMode != Settings.Secure.LOCATION_MODE_OFF
         } else {
             locationProviders = Settings.Secure.getString(
-                appContext.getContentResolver(),
+                appContext.contentResolver,
                 Settings.Secure.LOCATION_PROVIDERS_ALLOWED
             )
             !TextUtils.isEmpty(locationProviders)

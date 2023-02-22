@@ -3,8 +3,9 @@ package com.udacity.project4
 import android.app.Application
 import android.content.Intent
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.ktx.initialize
+import com.udacity.project4.locationreminders.ReminderDescriptionViewModel
 import com.udacity.project4.locationreminders.RemindersActivity
 import com.udacity.project4.locationreminders.data.ReminderDataSource
 import com.udacity.project4.locationreminders.data.local.LocalDB
@@ -49,6 +50,16 @@ class MyApp : Application()  {
 
                 )
             }
+
+            single {
+                //This view model is declared singleton to be used across multiple fragments
+                ReminderDescriptionViewModel(
+                    get(),
+                    get() as ReminderDataSource,
+                    get()
+
+                )
+            }
             single { RemindersLocalRepository(get()) as ReminderDataSource }
             single { LocalDB.createRemindersDao(this@MyApp) }
             single { GeoFenceHelper(this@MyApp) }
@@ -64,6 +75,7 @@ class MyApp : Application()  {
     }
 
     private fun isLoggedIn(){
+        Firebase.initialize(this@MyApp)
        val auth = FirebaseAuth.getInstance()
         if (auth.currentUser != null) {
             val intent = Intent(this, RemindersActivity::class.java)

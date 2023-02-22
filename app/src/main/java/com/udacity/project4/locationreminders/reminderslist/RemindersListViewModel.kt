@@ -63,7 +63,8 @@ class RemindersListViewModel(
         Timber.e("delete item ${id}")
         viewModelScope.launch {
             dataSource.deleteReminder(id)
-            geoFenceHelper.removeGeofence(listOf(id))
+            geoFenceHelper.removeGeofence(id)
+            showToast.value = "Reminder deleted "
             loadReminders()
         }
     }

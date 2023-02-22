@@ -1,7 +1,9 @@
 package com.udacity.project4.utils
 
+import com.google.android.gms.maps.model.LatLng
 
- const val REQUEST_TURN_DEVICE_LOCATION_ON = 29
+
+const val REQUEST_TURN_DEVICE_LOCATION_ON = 29
  const val REQUEST_FOREGROUND_AND_BACKGROUND_PERMISSION_RESULT_CODE = 33
  const val REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE = 34
 const val BACKGROUND_LOCATION_PERMISSION_INDEX = 1
@@ -17,3 +19,5 @@ const val GEOFENCE_PENDING_INTENT_CODE = 155
 
 const val ACTION_GEOFENCE_EVENT =
  "GeofenceHelper.project4.action.ACTION_GEOFENCE_EVENT"
+
+

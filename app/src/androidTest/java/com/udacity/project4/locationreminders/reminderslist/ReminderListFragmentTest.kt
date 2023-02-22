@@ -6,6 +6,7 @@ import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
+import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
@@ -16,7 +17,7 @@ import androidx.test.filters.MediumTest
 import com.udacity.project4.R
 import com.udacity.project4.data.FakeData
 import com.udacity.project4.locationreminders.data.ReminderDataSource
-import com.udacity.project4.locationreminders.data.local.LocalDB
+import com.udacity.project4.locationreminders.data.local.RemindersDatabase
 import com.udacity.project4.locationreminders.data.local.RemindersLocalRepository
 import com.udacity.project4.locationreminders.geofence.GeoFenceHelper
 import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
@@ -42,17 +43,23 @@ import org.mockito.Mockito.verify
 @ExperimentalCoroutinesApi
 //UI Testing
 @MediumTest
-class ReminderListFragmentTest  : KoinTest {
+class ReminderListFragmentTest : KoinTest {
 
     //    TODO: test the navigation of the fragments.
 //    TODO: test the displayed data on the UI.
 //    TODO: add testing for the error messages.
-    private lateinit  var repository : ReminderDataSource
-    private lateinit var appContext : Application
+    private lateinit var repository: ReminderDataSource
+    private lateinit var appContext: Application
+    private lateinit var database: RemindersDatabase
 
     @Before
     fun setUp() {
         stopKoin()//stop the original app koin
+        database = Room.inMemoryDatabaseBuilder(
+            ApplicationProvider.getApplicationContext(),
+            RemindersDatabase::class.java
+        ).allowMainThreadQueries().build()
+
         appContext = ApplicationProvider.getApplicationContext()
         val myModule = module {
             viewModel {
@@ -65,12 +72,12 @@ class ReminderListFragmentTest  : KoinTest {
             single {
                 SaveReminderViewModel(
                     appContext,
-                    get() as ReminderDataSource ,
+                    get() as ReminderDataSource,
                     get()
                 )
             }
-            single { RemindersLocalRepository(get()) as ReminderDataSource }
-            single { LocalDB.createRemindersDao(appContext) }
+            single { RemindersLocalRepository(get()) }
+            single { database.reminderDao() }
             single { GeoFenceHelper(appContext) }
         }
         //declare a new koin module
@@ -93,19 +100,19 @@ class ReminderListFragmentTest  : KoinTest {
     fun unSet() = stopKoin()
 
 
-
-    private fun insertReminders() = runTest  {
+    private fun insertReminders() = runTest {
         FakeData.remindersDTOList.forEachIndexed { index, reminderDataItem ->
             //Don't insert first reminder for testing
             repository.saveReminder(reminderDataItem)
         }
     }
+
     @Test
-    fun test(){
-      val scenario =  launchFragmentInContainer<ReminderListFragment>(Bundle(), R.style.AppTheme)
+    fun onClickAddReminder_NavigateToAddReminderScreen() {
+        val scenario = launchFragmentInContainer<ReminderListFragment>(Bundle(), R.style.AppTheme)
         val navController = mock(NavController::class.java)
         scenario.onFragment {
-            Navigation.setViewNavController(it.view!!,navController)
+            Navigation.setViewNavController(it.view!!, navController)
         }
         onView(withId(R.id.addReminderFAB)).perform(click())
 
@@ -115,16 +122,15 @@ class ReminderListFragmentTest  : KoinTest {
     }
 
     @Test
-    fun test2(){
-        val scenario =  launchFragmentInContainer<ReminderListFragment>(Bundle(), R.style.AppTheme)
+    fun onClickListItem_NavigateToAddReminderScreen() {
+        val scenario = launchFragmentInContainer<ReminderListFragment>(Bundle(), R.style.AppTheme)
         val navController = mock(NavController::class.java)
         scenario.onFragment {
-            Navigation.setViewNavController(it.view!!,navController)
+            Navigation.setViewNavController(it.view!!, navController)
         }
         onView(withId(R.id.reminderssRecyclerView)).perform(
             RecyclerViewActions.actionOnItem<RecyclerView.ViewHolder>(
-                hasDescendant(withText(FakeData.reminderDataItemsList.get(0).title))
-                , click()
+                hasDescendant(withText(FakeData.reminderDataItemsList.get(0).title)), click()
             )
         )
 

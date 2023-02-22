@@ -46,14 +46,11 @@ fun sendNotification(context: Context, reminderDataItem: ReminderDataItem) {
         }
 //    build the notification object with the data to be shown
     val notification = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
-        .setSmallIcon(R.drawable.ic_launcher_foreground)
+        .setSmallIcon(R.mipmap.ic_launcher_round)
         .setContentTitle(reminderDataItem.title)
         .setContentText(notificationContentText)
         .setContentIntent(notificationPendingIntent)
-
-            //ToDo set auto cancel to true
-        .setAutoCancel(false)
-
+        .setAutoCancel(true)
         .build()
 
     notificationManager.notify(getUniqueId(), notification)
