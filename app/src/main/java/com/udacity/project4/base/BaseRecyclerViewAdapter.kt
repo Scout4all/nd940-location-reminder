@@ -1,8 +1,15 @@
+/*
+ * Copyright (c) 2023.
+ * Developed by : Bigad Aboubakr
+ * Developer website : http://bigad.me
+ * Developer github : https://github.com/Scout4all
+ * Developer Email : bigad@bigad.me
+ */
+
 package com.udacity.project4.base
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.ImageButton
 import androidx.annotation.LayoutRes
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
@@ -63,7 +70,6 @@ abstract class BaseRecyclerViewAdapter<T>(private val callback: ((item: T) -> Un
 
     @LayoutRes
     abstract fun getLayoutRes(viewType: Int): Int
-
 
 
     open fun getLifecycleOwner(): LifecycleOwner? {

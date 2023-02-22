@@ -1,3 +1,11 @@
+<!--
+  ~ Copyright (c) 2023.
+  ~ Developed by : Bigad Aboubakr
+  ~ Developer website : http://bigad.me
+  ~ Developer github : https://github.com/Scout4all
+  ~ Developer Email : bigad@bigad.me
+  -->
+
 <resources>
     <!--    TODO: Before you run your application, you need a Google Maps API key.-->
     <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyDrLmNbBvrAX1j5ZamEoE_YT2eWCTp_X-U</string>

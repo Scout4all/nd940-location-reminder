@@ -1,3 +1,11 @@
+/*
+ * Copyright (c) 2023.
+ * Developed by : Bigad Aboubakr
+ * Developer website : http://bigad.me
+ * Developer github : https://github.com/Scout4all
+ * Developer Email : bigad@bigad.me
+ */
+
 package com.udacity.project4.locationreminders.geofence
 
 import android.content.Context
@@ -35,15 +43,15 @@ class GeofenceTransitionsJobIntentService : JobIntentService(), CoroutineScope {
     }
 
     override fun onHandleWork(intent: Intent) {
-        val geofencingEvent : GeofencingEvent = GeofencingEvent.fromIntent(intent)!!
-        if(geofencingEvent.hasError()){
+        val geofencingEvent: GeofencingEvent = GeofencingEvent.fromIntent(intent)!!
+        if (geofencingEvent.hasError()) {
             Timber.e("error ${geofencingEvent.errorCode}")
             return
         }
         Timber.e(geofencingEvent.triggeringGeofences.toString())
 
-        when(geofencingEvent.geofenceTransition){
-            Geofence.GEOFENCE_TRANSITION_ENTER ->{
+        when (geofencingEvent.geofenceTransition) {
+            Geofence.GEOFENCE_TRANSITION_ENTER -> {
                 sendNotification(geofencingEvent.triggeringGeofences!!)
 
             }
@@ -54,7 +62,7 @@ class GeofenceTransitionsJobIntentService : JobIntentService(), CoroutineScope {
     private fun sendNotification(triggeringGeofences: List<Geofence>) {
         var requestId = ""
 
-        for (geofence in triggeringGeofences){
+        for (geofence in triggeringGeofences) {
             Timber.e(geofence.requestId)
             requestId = geofence.requestId
         }

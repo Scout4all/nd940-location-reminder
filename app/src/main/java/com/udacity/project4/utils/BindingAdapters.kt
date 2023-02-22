@@ -1,16 +1,21 @@
+/*
+ * Copyright (c) 2023.
+ * Developed by : Bigad Aboubakr
+ * Developer website : http://bigad.me
+ * Developer github : https://github.com/Scout4all
+ * Developer Email : bigad@bigad.me
+ */
+
 package com.udacity.project4.utils
 
 import android.view.View
-import androidx.core.view.children
 import androidx.databinding.BindingAdapter
 import androidx.lifecycle.*
 import androidx.recyclerview.widget.RecyclerView
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.udacity.project4.base.BaseRecyclerViewAdapter
-import com.udacity.project4.locationreminders.reminderslist.ReminderDataItem
 
 
-object BindingAdapters  {
+object BindingAdapters {
 
     /**
      * Use binding adapter to set the recycler view data using livedata object
@@ -48,8 +53,6 @@ object BindingAdapters  {
             }
         }
     }
-
-
 
 
 }

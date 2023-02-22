@@ -1,3 +1,11 @@
+/*
+ * Copyright (c) 2023.
+ * Developed by : Bigad Aboubakr
+ * Developer website : http://bigad.me
+ * Developer github : https://github.com/Scout4all
+ * Developer Email : bigad@bigad.me
+ */
+
 package com.udacity.project4.locationreminders.reminderslist
 
 import android.content.Intent
@@ -11,7 +19,6 @@ import com.udacity.project4.authentication.AuthenticationActivity
 import com.udacity.project4.base.BaseFragment
 import com.udacity.project4.base.NavigationCommand
 import com.udacity.project4.databinding.FragmentRemindersBinding
-import com.udacity.project4.locationreminders.ReminderDescriptionActivity
 import com.udacity.project4.utils.setDisplayHomeAsUpEnabled
 import com.udacity.project4.utils.setTitle
 import com.udacity.project4.utils.setup
@@ -90,8 +97,8 @@ class ReminderListFragment : BaseFragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.logout -> {
-                 AuthUI.getInstance().signOut(requireContext()).addOnCompleteListener() {
-                    val intent = Intent(requireActivity(),AuthenticationActivity::class.java)
+                AuthUI.getInstance().signOut(requireContext()).addOnCompleteListener() {
+                    val intent = Intent(requireActivity(), AuthenticationActivity::class.java)
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
 
                     startActivity(intent)
@@ -100,7 +107,7 @@ class ReminderListFragment : BaseFragment() {
                 }
 
             }
-            R.id.delete_all ->{
+            R.id.delete_all -> {
                 _viewModel.deleteAllReminders()
             }
         }

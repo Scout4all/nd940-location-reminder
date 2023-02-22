@@ -1,3 +1,11 @@
+/*
+ * Copyright (c) 2023.
+ * Developed by : Bigad Aboubakr
+ * Developer website : http://bigad.me
+ * Developer github : https://github.com/Scout4all
+ * Developer Email : bigad@bigad.me
+ */
+
 package com.udacity.project4.locationreminders.data.local
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
@@ -9,7 +17,6 @@ import com.udacity.project4.data.FakeData
 import com.udacity.project4.locationreminders.data.dto.ReminderDTO
 import com.udacity.project4.util.MainCoroutineRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.*
@@ -47,7 +54,7 @@ class RemindersDaoTest {
 
     }
 
-    private fun insertReminders() = mainCoroutineRule.runTest  {
+    private fun insertReminders() = mainCoroutineRule.runTest {
         FakeData.remindersDTOList.forEachIndexed { index, reminderDataItem ->
             database.reminderDao().saveReminder(reminderDataItem)
         }

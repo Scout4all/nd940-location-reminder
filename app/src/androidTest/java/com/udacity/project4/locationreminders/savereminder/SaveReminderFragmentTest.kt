@@ -6,36 +6,30 @@
  * Developer Email : bigad@bigad.me
  */
 
-package com.udacity.project4.locationreminders.reminderslist
+package com.udacity.project4.locationreminders.savereminder
 
 import android.app.Application
 import android.os.Bundle
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
-import androidx.recyclerview.widget.RecyclerView
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.contrib.RecyclerViewActions
-import androidx.test.espresso.matcher.ViewMatchers.*
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.MediumTest
+import androidx.test.espresso.Espresso
+import androidx.test.espresso.action.ViewActions
+import androidx.test.espresso.assertion.ViewAssertions
+import androidx.test.espresso.matcher.ViewMatchers
 import com.udacity.project4.R
 import com.udacity.project4.data.FakeData
 import com.udacity.project4.locationreminders.data.ReminderDataSource
 import com.udacity.project4.locationreminders.data.local.RemindersDatabase
 import com.udacity.project4.locationreminders.data.local.RemindersLocalRepository
 import com.udacity.project4.locationreminders.geofence.GeoFenceHelper
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.After
-import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.startKoin
@@ -43,18 +37,10 @@ import org.koin.core.context.stopKoin
 import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.get
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.verify
+import org.mockito.Mockito
 
-@RunWith(AndroidJUnit4::class)
-@ExperimentalCoroutinesApi
-//UI Testing
-@MediumTest
-class ReminderListFragmentTest : KoinTest {
+class SaveReminderFragmentTest : KoinTest {
 
-    //    TODO: test the navigation of the fragments.
-//    TODO: test the displayed data on the UI.
-//    TODO: add testing for the error messages.
     private lateinit var repository: ReminderDataSource
     private lateinit var appContext: Application
     private lateinit var database: RemindersDatabase
@@ -73,7 +59,7 @@ class ReminderListFragmentTest : KoinTest {
 
         val myModule = module {
             viewModel {
-                RemindersListViewModel(
+                SaveReminderViewModel(
                     appContext,
                     get() as ReminderDataSource,
                     get()
@@ -111,36 +97,45 @@ class ReminderListFragmentTest : KoinTest {
     }
 
     @Test
-    fun onClickAddReminder_NavigateToAddReminderScreen() {
-        val scenario = launchFragmentInContainer<ReminderListFragment>(Bundle(), R.style.AppTheme)
-        val navController = mock(NavController::class.java)
-        scenario.onFragment {
-            Navigation.setViewNavController(it.view!!, navController)
-        }
-        onView(withId(R.id.addReminderFAB)).perform(click())
+    fun addReminderTest_notSelectedLocationErrors_ResultShowToastSnakeBar() {
+        val bundle = Bundle()
+        bundle.putParcelable("dataItem", null)
+        val scenario = launchFragmentInContainer<SaveReminderFragment>(bundle, R.style.AppTheme)
 
-        verify(navController).navigate(
-            ReminderListFragmentDirections.toSaveReminder(null)
-        )
+        Espresso.onView(ViewMatchers.withId(R.id.reminderTitle))
+            .perform(ViewActions.typeText(FakeData.remindersDTOList.get(0).title))
+        Espresso.closeSoftKeyboard()
+        //check empty location when save button
+        Espresso.onView(ViewMatchers.withId(R.id.saveReminder)).perform(ViewActions.click())
+
+        Espresso.onView(ViewMatchers.withText(R.string.err_select_location))
+            .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
     }
 
     @Test
-    fun onClickListItem_NavigateToAddReminderScreen() {
-        val scenario = launchFragmentInContainer<ReminderListFragment>(Bundle(), R.style.AppTheme)
-        val navController = mock(NavController::class.java)
+    fun addReminderTest_emptyTitle_ResultShowToastSnakeBar() {
+        val bundle = Bundle()
+        bundle.putParcelable("dataItem", null)
+        val scenario = launchFragmentInContainer<SaveReminderFragment>(bundle, R.style.AppTheme)
+        //check empty title save button
+        Espresso.onView(ViewMatchers.withId(R.id.saveReminder)).perform(ViewActions.click())
+
+        Espresso.onView(ViewMatchers.withText(R.string.err_enter_title))
+            .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+    }
+
+    @Test
+    fun onClickSelectLocation_NavigateToSelectLocationScreen() {
+        val bundle = Bundle()
+        bundle.putParcelable("dataItem", null)
+        val scenario = launchFragmentInContainer<SaveReminderFragment>(bundle, R.style.AppTheme)
+        val navController = Mockito.mock(NavController::class.java)
         scenario.onFragment {
             Navigation.setViewNavController(it.view!!, navController)
         }
-        onView(withId(R.id.reminderssRecyclerView)).perform(
-            RecyclerViewActions.actionOnItem<RecyclerView.ViewHolder>(
-                hasDescendant(withText(FakeData.reminderDataItemsList.get(0).title)), click()
-            )
-        )
-
-        verify(navController).navigate(
-            ReminderListFragmentDirections.toSaveReminder(FakeData.reminderDataItemsList.get(0))
+        Espresso.onView(ViewMatchers.withId(R.id.selectLocation)).perform(ViewActions.click())
+        Mockito.verify(navController).navigate(
+            SaveReminderFragmentDirections.actionSaveReminderFragmentToSelectLocationFragment()
         )
     }
-
-
 }

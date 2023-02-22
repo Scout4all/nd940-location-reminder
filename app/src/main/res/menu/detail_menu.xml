@@ -1,12 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:tools="http://schemas.android.com/tools"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<!--
+  ~ Copyright (c) 2023.
+  ~ Developed by : Bigad Aboubakr
+  ~ Developer website : http://bigad.me
+  ~ Developer github : https://github.com/Scout4all
+  ~ Developer Email : bigad@bigad.me
+  -->
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
     <item
         android:id="@+id/menu_delete_reminder"
+        android:icon="@drawable/baseline_delete_24"
+        android:iconTint="@color/white"
         android:title="@string/delete_reminder"
         app:showAsAction="always"
-        android:iconTint="@color/white"
-        android:icon="@drawable/baseline_delete_24"
         tools:ignore="UnusedAttribute" />
 </menu>

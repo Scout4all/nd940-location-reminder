@@ -1,16 +1,28 @@
+/*
+ * Copyright (c) 2023.
+ * Developed by : Bigad Aboubakr
+ * Developer website : http://bigad.me
+ * Developer github : https://github.com/Scout4all
+ * Developer Email : bigad@bigad.me
+ */
+
 package com.udacity.project4.data
 
 import androidx.annotation.VisibleForTesting
 import com.udacity.project4.locationreminders.data.dto.ReminderDTO
 import com.udacity.project4.locationreminders.reminderslist.ReminderDataItem
+
 @VisibleForTesting(otherwise = VisibleForTesting.NONE)
 object FakeData {
 
     val remindersDTOList = listOf(
-        ReminderDTO("Work there",
-            "one day i will go there","Google Dubai",25.1003948,55.162867,
-            "ChIJAAAAAAAAAAARd8D2Azy-09Q"),
-        ReminderDTO("Say Hi to Friend",
+        ReminderDTO(
+            "Work there",
+            "one day i will go there", "Google Dubai", 25.1003948, 55.162867,
+            "ChIJAAAAAAAAAAARd8D2Azy-09Q"
+        ),
+        ReminderDTO(
+            "Say Hi to Friend",
             "\n" +
                     "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eget pretium leo. Fusce tempus sapien viverra leo lobortis lacinia. Pellentesque at pharetra lorem. Nunc finibus tempor hendrerit. Nam pellentesque, eros vestibulum consequat tristique, eros diam sodales neque, quis feugiat ex elit at ligula. Phasellus vehicula viverra scelerisque. Etiam volutpat dui eget lacinia venenatis. Duis vestibulum lobortis lacus, quis ultricies ex lacinia id. Nullam tempor lectus molestie purus cursus, a gravida metus pharetra. Maecenas bibendum justo sed dictum rutrum. Quisque dictum ipsum ut magna mattis, id maximus lacus ultricies.\n" +
                     "\n" +
@@ -22,35 +34,47 @@ object FakeData {
                     "\n" +
                     "In hac habitasse platea dictumst. Mauris ultricies dignissim ultricies. Integer tincidunt pulvinar elit, at hendrerit justo blandit ut. Nam egestas, lacus sodales luctus aliquet, ipsum enim commodo ipsum, eget vestibulum eros risus sed mauris. Suspendisse quis hendrerit dui. Nulla facilisi. Nulla ac imperdiet orci. Donec cursus dolor ut nisi fringilla, in suscipit orci maximus. Donec vitae scelerisque lacus. Nam malesuada nunc vel aliquet pretium. Duis imperdiet quam purus, vitae tempor ligula placerat sed. Nullam condimentum purus felis, nec porta leo pellentesque ac. Nullam malesuada volutpat ipsum, nec mollis odio rutrum vel.",
             "Sajilni.com \n - Event Management Solution \n Event ticket seller",
-            25.095428,55.160083,
-            "ChIJAAAAAAAAAAARrShgG2SUNc0"),
+            25.095428, 55.160083,
+            "ChIJAAAAAAAAAAARrShgG2SUNc0"
+        ),
 
-    ReminderDTO("Meet Friend",
-        "daily friend meeting at evening","Caribou Coffee",
-        25.104943,55.168110,
-        "ChIJAAAAAAAAAAARfyitG2mPJTc")
+        ReminderDTO(
+            "Meet Friend",
+            "daily friend meeting at evening", "Caribou Coffee",
+            25.104943, 55.168110,
+            "ChIJAAAAAAAAAAARfyitG2mPJTc"
+        )
     )
 
 
     val reminderDataItemsList = listOf(
-  ReminderDataItem("Work there",
-    "one day i will go there","Google Dubai",25.1003948,55.162867,
-    "ChIJAAAAAAAAAAARd8D2Azy-09Q"),
-     ReminderDataItem("Say Hi to Friend",
-        "say hi to other good developer there","Sajilni.com - Event Management Solution Event ticket seller",
-        25.095428,55.160083,
-        "ChIJAAAAAAAAAAARrShgG2SUNc0"),
- ReminderDataItem(null,
-        "daily friend meeting at evening","Caribou Coffee",
-        25.104943,55.168110,
-        "ChIJAAAAAAAAAAARfyitG2mPJTc"),
+        ReminderDataItem(
+            "Work there",
+            "one day i will go there", "Google Dubai", 25.1003948, 55.162867,
+            "ChIJAAAAAAAAAAARd8D2Azy-09Q"
+        ),
+        ReminderDataItem(
+            "Say Hi to Friend",
+            "say hi to other good developer there",
+            "Sajilni.com - Event Management Solution Event ticket seller",
+            25.095428,
+            55.160083,
+            "ChIJAAAAAAAAAAARrShgG2SUNc0"
+        ),
+        ReminderDataItem(
+            null,
+            "daily friend meeting at evening", "Caribou Coffee",
+            25.104943, 55.168110,
+            "ChIJAAAAAAAAAAARfyitG2mPJTc"
+        ),
 
-     ReminderDataItem("Say Hi to Friend",
-        "daily friend meeting at evening",null,
-        25.104943,55.168110,
-        "ChIJAAAAAAAAAAARfyitG2mPJTc"),
+        ReminderDataItem(
+            "Say Hi to Friend",
+            "daily friend meeting at evening", null,
+            25.104943, 55.168110,
+            "ChIJAAAAAAAAAAARfyitG2mPJTc"
+        ),
     )
 
 
-
- }
+}

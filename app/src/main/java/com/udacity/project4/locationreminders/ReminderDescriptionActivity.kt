@@ -1,3 +1,11 @@
+/*
+ * Copyright (c) 2023.
+ * Developed by : Bigad Aboubakr
+ * Developer website : http://bigad.me
+ * Developer github : https://github.com/Scout4all
+ * Developer Email : bigad@bigad.me
+ */
+
 package com.udacity.project4.locationreminders
 
 import android.content.Context
@@ -34,15 +42,15 @@ class ReminderDescriptionActivity : AppCompatActivity() {
     }
 
     private lateinit var binding: ActivityReminderDescriptionBinding
-    private val _viewModel : ReminderDescriptionViewModel by inject ()
-    private var reminderItem :ReminderDataItem? = null
+    private val _viewModel: ReminderDescriptionViewModel by inject()
+    private var reminderItem: ReminderDataItem? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(
             this,
             R.layout.activity_reminder_description
         )
-        if(Firebase.auth.currentUser == null){
+        if (Firebase.auth.currentUser == null) {
             val intent = Intent(this, AuthenticationActivity::class.java)
             startActivity(intent)
         }
@@ -50,9 +58,9 @@ class ReminderDescriptionActivity : AppCompatActivity() {
         val intent = getIntent()
 
         Timber.e(intent.getSerializableExtra(EXTRA_ReminderDataItem).toString())
-        if(intent.getSerializableExtra(EXTRA_ReminderDataItem)!= null) {
+        if (intent.getSerializableExtra(EXTRA_ReminderDataItem) != null) {
 
-              reminderItem=  intent.getSerializableExtra(EXTRA_ReminderDataItem) as ReminderDataItem?
+            reminderItem = intent.getSerializableExtra(EXTRA_ReminderDataItem) as ReminderDataItem?
         }
         binding.reminderDataItem = reminderItem
 
@@ -69,7 +77,7 @@ class ReminderDescriptionActivity : AppCompatActivity() {
         return when (item.itemId) {
             R.id.menu_delete_reminder -> {
                 _viewModel.deleteItem(reminderItem?.id!!)
-                 val intent = Intent(this,RemindersActivity::class.java)
+                val intent = Intent(this, RemindersActivity::class.java)
                 startActivity(intent)
 
                 true

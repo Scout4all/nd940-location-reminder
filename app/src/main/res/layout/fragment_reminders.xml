@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2023.
+  ~ Developed by : Bigad Aboubakr
+  ~ Developer website : http://bigad.me
+  ~ Developer github : https://github.com/Scout4all
+  ~ Developer Email : bigad@bigad.me
+  -->
+
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">

@@ -1,3 +1,11 @@
+/*
+ * Copyright (c) 2023.
+ * Developed by : Bigad Aboubakr
+ * Developer website : http://bigad.me
+ * Developer github : https://github.com/Scout4all
+ * Developer Email : bigad@bigad.me
+ */
+
 package com.udacity.project4.locationreminders.geofence
 
 import android.annotation.SuppressLint
@@ -69,7 +77,7 @@ class GeoFenceHelper(base: Application?) : ContextWrapper(base) {
             .build()
     }
 
-    fun removeGeofence(geofenceID:  String? = null ) {
+    fun removeGeofence(geofenceID: String? = null) {
         if (geofenceID.isNullOrEmpty()) {
             geofencingClient.removeGeofences(geofenceIntent).run {
                 addOnFailureListener {

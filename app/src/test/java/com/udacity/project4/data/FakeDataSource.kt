@@ -1,3 +1,11 @@
+/*
+ * Copyright (c) 2023.
+ * Developed by : Bigad Aboubakr
+ * Developer website : http://bigad.me
+ * Developer github : https://github.com/Scout4all
+ * Developer Email : bigad@bigad.me
+ */
+
 package com.udacity.project4.data
 
 import androidx.annotation.VisibleForTesting
@@ -7,15 +15,17 @@ import com.udacity.project4.locationreminders.data.dto.Result
 
 //Use FakeDataSource that acts as a test double to the LocalDataSource
 @VisibleForTesting(otherwise = VisibleForTesting.NONE)
-class FakeDataSource (val reminders : MutableList<ReminderDTO>? = mutableListOf()): ReminderDataSource {
+class FakeDataSource(val reminders: MutableList<ReminderDTO>? = mutableListOf()) :
+    ReminderDataSource {
 
-     private var hasErrors = false
-   fun setForceError(){
-       this.hasErrors = true
+    private var hasErrors = false
+    fun setForceError() {
+        this.hasErrors = true
 
-   }
+    }
+
     override suspend fun getReminders(): Result<List<ReminderDTO>> {
-        if(!hasErrors){
+        if (!hasErrors) {
             reminders?.let {
                 return Result.Success(ArrayList(it))
             }
@@ -29,14 +39,14 @@ class FakeDataSource (val reminders : MutableList<ReminderDTO>? = mutableListOf(
     }
 
     override suspend fun getReminder(id: String): Result<ReminderDTO> {
-  if(!hasErrors){
-      reminders?.let {remindersList->
-          val reminder = remindersList.filter { reminder->
-              reminder.id == id
-          }.single()
-          return Result.Success(reminder)
-      }
-  }
+        if (!hasErrors) {
+            reminders?.let { remindersList ->
+                val reminder = remindersList.filter { reminder ->
+                    reminder.id == id
+                }.single()
+                return Result.Success(reminder)
+            }
+        }
         return Result.Error("Error in retrieve reminder")
     }
 

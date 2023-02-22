@@ -1,21 +1,26 @@
+/*
+ * Copyright (c) 2023.
+ * Developed by : Bigad Aboubakr
+ * Developer website : http://bigad.me
+ * Developer github : https://github.com/Scout4all
+ * Developer Email : bigad@bigad.me
+ */
+
 package com.udacity.project4.authentication
 
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
-import androidx.lifecycle.map
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.ktx.initialize
 import com.udacity.project4.R
 import com.udacity.project4.databinding.ActivityAuthenticationBinding
 import com.udacity.project4.locationreminders.RemindersActivity
-import org.koin.android.ext.android.inject
 import timber.log.Timber
 
 /**
@@ -25,7 +30,6 @@ import timber.log.Timber
 class AuthenticationActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAuthenticationBinding
-
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,7 +42,6 @@ class AuthenticationActivity : AppCompatActivity() {
         }
 
 
-
     }
 
 
@@ -49,14 +52,24 @@ class AuthenticationActivity : AppCompatActivity() {
     }
 
 
-
     override fun onResume() {
         super.onResume()
         //check if user logged in move him to Reminders activity
-        if (Firebase.auth.currentUser != null) {
+        checkLogin()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        checkLogin()
+    }
+
+    private fun checkLogin() {
+        Firebase.initialize(this@AuthenticationActivity)
+        val auth = FirebaseAuth.getInstance()
+        if (auth.currentUser != null) {
             val intent = Intent(this, RemindersActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
-            finish()
         }
     }
 

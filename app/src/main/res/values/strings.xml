@@ -1,3 +1,11 @@
+<!--
+  ~ Copyright (c) 2023.
+  ~ Developed by : Bigad Aboubakr
+  ~ Developer website : http://bigad.me
+  ~ Developer github : https://github.com/Scout4all
+  ~ Developer Email : bigad@bigad.me
+  -->
+
 <resources>
     <string name="app_name">Location Reminders</string>
     <string name="error_happened">Error happened</string>
@@ -45,4 +53,5 @@
     <string name="delete_all_notes">Delete All Notes</string>
     <string name="confirm_btn">Confirm</string>
     <string name="delete_reminder">delete reminder</string>
+    <string name="location_name">Location name</string>
 </resources>

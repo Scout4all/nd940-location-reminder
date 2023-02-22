@@ -1,34 +1,56 @@
+/*
+ * Copyright (c) 2023.
+ * Developed by : Bigad Aboubakr
+ * Developer website : http://bigad.me
+ * Developer github : https://github.com/Scout4all
+ * Developer Email : bigad@bigad.me
+ */
+
 package com.udacity.project4.data
 
 import androidx.annotation.VisibleForTesting
 import com.udacity.project4.locationreminders.data.dto.ReminderDTO
 import com.udacity.project4.locationreminders.reminderslist.ReminderDataItem
+
 @VisibleForTesting(otherwise = VisibleForTesting.NONE)
 object FakeData {
     //
-    val reminderDataItem1 = ReminderDataItem("Work there",
-        "one day i will go there","Google Dubai",25.1003948,55.162867,
-        "ChIJAAAAAAAAAAARd8D2Azy-09Q")
-    val reminderDataItem2= ReminderDataItem("Say Hi to Friend",
-        "say hi to other good developer there","Sajilni.com - Event Management Solution Event ticket seller",
-        25.095428,55.160083,
-        "ChIJAAAAAAAAAAARrShgG2SUNc0")
-    val  reminderDataNullTitle= ReminderDataItem(null,
-        "daily friend meeting at evening","Caribou Coffee",
-        25.104943,55.168110,
-        "ChIJAAAAAAAAAAARfyitG2mPJTc")
+    val reminderDataItem1 = ReminderDataItem(
+        "Work there",
+        "one day i will go there", "Google Dubai", 25.1003948, 55.162867,
+        "ChIJAAAAAAAAAAARd8D2Azy-09Q"
+    )
+    val reminderDataItem2 = ReminderDataItem(
+        "Say Hi to Friend",
+        "say hi to other good developer there",
+        "Sajilni.com - Event Management Solution Event ticket seller",
+        25.095428,
+        55.160083,
+        "ChIJAAAAAAAAAAARrShgG2SUNc0"
+    )
+    val reminderDataNullTitle = ReminderDataItem(
+        null,
+        "daily friend meeting at evening", "Caribou Coffee",
+        25.104943, 55.168110,
+        "ChIJAAAAAAAAAAARfyitG2mPJTc"
+    )
 
-    val  reminderDataNullLocation= ReminderDataItem("Say Hi to Frien",
-        "daily friend meeting at evening",null,
-        25.104943,55.168110,
-        "ChIJAAAAAAAAAAARfyitG2mPJTc")
+    val reminderDataNullLocation = ReminderDataItem(
+        "Say Hi to Frien",
+        "daily friend meeting at evening", null,
+        25.104943, 55.168110,
+        "ChIJAAAAAAAAAAARfyitG2mPJTc"
+    )
 
     val remindersDTOList = listOf(
-        ReminderDTO("Work there",
-            "one day i will go there","Google Dubai",25.1003948,55.162867,
-            "ChIJAAAAAAAAAAARd8D2Azy-09Q"),
+        ReminderDTO(
+            "Work there",
+            "one day i will go there", "Google Dubai", 25.1003948, 55.162867,
+            "ChIJAAAAAAAAAAARd8D2Azy-09Q"
+        ),
 
-        ReminderDTO("Say Hi to Friend",
+        ReminderDTO(
+            "Say Hi to Friend",
             "\n" +
                     "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eget pretium leo. Fusce tempus sapien viverra leo lobortis lacinia. Pellentesque at pharetra lorem. Nunc finibus tempor hendrerit. Nam pellentesque, eros vestibulum consequat tristique, eros diam sodales neque, quis feugiat ex elit at ligula. Phasellus vehicula viverra scelerisque. Etiam volutpat dui eget lacinia venenatis. Duis vestibulum lobortis lacus, quis ultricies ex lacinia id. Nullam tempor lectus molestie purus cursus, a gravida metus pharetra. Maecenas bibendum justo sed dictum rutrum. Quisque dictum ipsum ut magna mattis, id maximus lacus ultricies.\n" +
                     "\n" +
@@ -38,17 +60,20 @@ object FakeData {
                     "\n" +
                     "Donec ut augue ut nibh placerat interdum. Nulla dapibus purus vel nunc sodales, eu gravida augue porta. Cras pretium, risus nec euismod volutpat, enim nisi accumsan nunc, ut porttitor mi enim sit amet nunc. Nulla a libero vel justo accumsan accumsan at ut quam. Integer vel risus porta, elementum mauris ac, tempus purus. Praesent posuere, arcu sed dignissim accumsan, dui enim luctus sapien, at gravida massa enim nec nisl. Vestibulum rutrum nisi a mattis lobortis. Aenean dapibus nisl sed mollis cursus. Mauris tempus magna a odio feugiat ullamcorper fermentum eu purus. Donec in tellus finibus, molestie urna et, egestas nulla. Sed eu vestibulum arcu.\n" +
                     "\n" +
-                    "In hac habitasse platea dictumst. Mauris ultricies dignissim ultricies. Integer tincidunt pulvinar elit, at hendrerit justo blandit ut. Nam egestas, lacus sodales luctus aliquet, ipsum enim commodo ipsum, eget vestibulum eros risus sed mauris. Suspendisse quis hendrerit dui. Nulla facilisi. Nulla ac imperdiet orci. Donec cursus dolor ut nisi fringilla, in suscipit orci maximus. Donec vitae scelerisque lacus. Nam malesuada nunc vel aliquet pretium. Duis imperdiet quam purus, vitae tempor ligula placerat sed. Nullam condimentum purus felis, nec porta leo pellentesque ac. Nullam malesuada volutpat ipsum, nec mollis odio rutrum vel.","Sajilni.com - Event Management Solution Event ticket seller",
-            25.095428,55.160083,
-            "ChIJAAAAAAAAAAARrShgG2SUNc0"),
+                    "In hac habitasse platea dictumst. Mauris ultricies dignissim ultricies. Integer tincidunt pulvinar elit, at hendrerit justo blandit ut. Nam egestas, lacus sodales luctus aliquet, ipsum enim commodo ipsum, eget vestibulum eros risus sed mauris. Suspendisse quis hendrerit dui. Nulla facilisi. Nulla ac imperdiet orci. Donec cursus dolor ut nisi fringilla, in suscipit orci maximus. Donec vitae scelerisque lacus. Nam malesuada nunc vel aliquet pretium. Duis imperdiet quam purus, vitae tempor ligula placerat sed. Nullam condimentum purus felis, nec porta leo pellentesque ac. Nullam malesuada volutpat ipsum, nec mollis odio rutrum vel.",
+            "Sajilni.com - Event Management Solution Event ticket seller",
+            25.095428,
+            55.160083,
+            "ChIJAAAAAAAAAAARrShgG2SUNc0"
+        ),
 
-        ReminderDTO("Meet Friend",
-            "daily friend meeting at evening","Caribou Coffee",
-            25.104943,55.168110,
-            "ChIJAAAAAAAAAAARfyitG2mPJTc")
+        ReminderDTO(
+            "Meet Friend",
+            "daily friend meeting at evening", "Caribou Coffee",
+            25.104943, 55.168110,
+            "ChIJAAAAAAAAAAARfyitG2mPJTc"
+        )
     )
-
-
 
 
 }

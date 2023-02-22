@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2023.
+  ~ Developed by : Bigad Aboubakr
+  ~ Developer website : http://bigad.me
+  ~ Developer github : https://github.com/Scout4all
+  ~ Developer Email : bigad@bigad.me
+  -->
+
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
@@ -8,17 +16,17 @@
         <variable
             name="item"
             type="com.udacity.project4.locationreminders.reminderslist.ReminderDataItem" />
-       </data>
+    </data>
 
     <androidx.cardview.widget.CardView
         android:id="@+id/reminderCardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/padding_medium"
-        android:foreground="?android:attr/selectableItemBackground"
         android:clickable="true"
         android:fadeVisible="@{true}"
-        android:focusable="true">
+        android:focusable="true"
+        android:foreground="?android:attr/selectableItemBackground">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -42,29 +50,28 @@
                 android:id="@+id/description"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLength="50"
+                android:maxLines="2"
                 android:text="@{item.description}"
                 android:textSize="@dimen/text_size_small"
-                android:maxLines="2"
-                android:maxLength="50"
-                android:ellipsize="end"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="@id/title"
                 app:layout_constraintTop_toBottomOf="@id/location"
-                app:layout_constraintEnd_toEndOf="parent"
                 tools:text="Description" />
 
             <TextView
+                android:id="@+id/location"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="@{item.location}"
                 android:textColor="@color/colorAccent"
                 android:textSize="@dimen/text_size_small"
-                android:id="@+id/location"
                 app:layout_constraintBottom_toBottomOf="@+id/description"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/title"
                 tools:text="Location" />
-
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

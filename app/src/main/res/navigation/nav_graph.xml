@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2023.
+  ~ Developed by : Bigad Aboubakr
+  ~ Developer website : http://bigad.me
+  ~ Developer github : https://github.com/Scout4all
+  ~ Developer Email : bigad@bigad.me
+  -->
+
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/nav_graph"
@@ -10,7 +18,7 @@
         android:label="ReminderListFragment">
         <action
             android:id="@+id/to_save_reminder"
-            app:destination="@id/saveReminderFragment" >
+            app:destination="@id/saveReminderFragment">
 
         </action>
     </fragment>
@@ -31,8 +39,7 @@
         <argument
             android:name="dataItem"
             app:argType="com.udacity.project4.locationreminders.reminderslist.ReminderDataItem"
-            app:nullable="true"
-              />
+            app:nullable="true" />
 
     </fragment>
     <fragment

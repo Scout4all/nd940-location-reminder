@@ -1,3 +1,11 @@
+/*
+ * Copyright (c) 2023.
+ * Developed by : Bigad Aboubakr
+ * Developer website : http://bigad.me
+ * Developer github : https://github.com/Scout4all
+ * Developer Email : bigad@bigad.me
+ */
+
 package com.udacity.project4.base
 
 import androidx.databinding.ViewDataBinding
@@ -11,7 +19,7 @@ class DataBindingViewHolder<T>(private val binding: ViewDataBinding) :
     RecyclerView.ViewHolder(binding.root) {
 
     fun bind(item: T) {
-        binding.setVariable(BR.item , item)
+        binding.setVariable(BR.item, item)
         binding.executePendingBindings()
     }
 

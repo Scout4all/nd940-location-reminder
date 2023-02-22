@@ -1,3 +1,11 @@
+/*
+ * Copyright (c) 2023.
+ * Developed by : Bigad Aboubakr
+ * Developer website : http://bigad.me
+ * Developer github : https://github.com/Scout4all
+ * Developer Email : bigad@bigad.me
+ */
+
 package com.udacity.project4.locationreminders.savereminder.selectreminderlocation
 
 
@@ -18,14 +26,13 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.android.gms.tasks.Task
-import com.google.android.material.snackbar.Snackbar
 import com.udacity.project4.R
 import com.udacity.project4.base.BaseFragment
-import com.udacity.project4.base.NavigationCommand
 import com.udacity.project4.databinding.FragmentSelectLocationBinding
 import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
 import com.udacity.project4.utils.DEFAULT_ZOOM
 import com.udacity.project4.utils.LOCATION_DEFAULT_RADIUS
+import com.udacity.project4.utils.hideKeyboard
 import com.udacity.project4.utils.setDisplayHomeAsUpEnabled
 import org.koin.android.ext.android.inject
 import timber.log.Timber
@@ -41,7 +48,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     private lateinit var binding: FragmentSelectLocationBinding
     private lateinit var mMap: GoogleMap
 
-    val DEFAULT_LOCATION_LATLNG =LatLng(37.4220658,-122.0840907)
+    val DEFAULT_LOCATION_LATLNG = LatLng(37.4220658, -122.0840907)
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -62,34 +69,9 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     }
 
 
-
-
-
-    private fun saveLocation(poi: PointOfInterest) {
-
-        _viewModel.latitude.value = poi.latLng.latitude
-        _viewModel.longitude.value = poi.latLng.longitude
-        _viewModel.selectedPOI.value = poi
-        _viewModel.reminderSelectedLocationStr.value = poi.name
-
-        addCircle(poi.latLng)
-
-        val snackbar =
-            Snackbar.make(binding.root, "Add ${poi.name} as location to your reminder", Snackbar.LENGTH_LONG)
-        snackbar.setAction(getString(R.string.confirm_btn)) {
-
-
-            _viewModel.navigationCommand.value = NavigationCommand.Back
-        }
-        snackbar.show()
-    }
-
-
-
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
         getCurrentLocation(googleMap)
-//        enableMyLocation(googleMap)
         getCurrentLocation(googleMap)
         onLocationSelected(googleMap)
         setMapStyle(googleMap)
@@ -99,29 +81,41 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     private fun onLocationSelected(map: GoogleMap) {
 
         map.setOnPoiClickListener { poi ->
+            binding.hy.visibility = View.GONE
+            binding.addTitle.visibility = View.GONE
             map.clear()
             map.addMarker(
                 MarkerOptions().position(poi.latLng).title(poi.name)
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
 
             )
-            saveLocation(poi)
+            addCircle(poi.latLng)
+            _viewModel.saveLocation(poi)
         }
     }
+
     private fun setOnMapClick(googleMap: GoogleMap) {
-        googleMap.setOnMapClickListener {
+        googleMap.setOnMapClickListener { latLng ->
             googleMap.clear()
+            binding.hy.text.clear()
+            binding.hy.visibility = View.VISIBLE
+            binding.addTitle.visibility = View.VISIBLE
+
             googleMap.addMarker(
-                MarkerOptions().position(it).title(_viewModel.reminderTitle.value)
+                MarkerOptions().position(latLng).title(binding.hy.text.toString())
             )
-            val pointOfInterest = PointOfInterest(
-                it, UUID.randomUUID().toString(), _viewModel.reminderTitle.value!!
-            )
-            saveLocation(pointOfInterest)
+            addCircle(latLng)
+
+            binding.addTitle.setOnClickListener {
+                it.let { activity?.hideKeyboard(it) }
+                val pointOfInterest = PointOfInterest(
+                    LatLng(latLng.latitude, latLng.longitude), UUID.randomUUID().toString(),
+                    binding.hy.text.toString()
+                )
+                _viewModel.saveLocation(pointOfInterest)
+            }
 
         }
-
-
     }
 
 

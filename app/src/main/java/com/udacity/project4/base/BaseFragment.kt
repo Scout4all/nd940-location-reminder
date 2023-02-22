@@ -1,3 +1,11 @@
+/*
+ * Copyright (c) 2023.
+ * Developed by : Bigad Aboubakr
+ * Developer website : http://bigad.me
+ * Developer github : https://github.com/Scout4all
+ * Developer Email : bigad@bigad.me
+ */
+
 package com.udacity.project4.base
 
 import android.widget.Toast
@@ -5,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
+import com.udacity.project4.R
 
 /**
  * Base Fragment to observe on the common LiveData objects
@@ -29,6 +38,15 @@ abstract class BaseFragment : Fragment() {
         _viewModel.showSnackBarInt.observe(this, Observer {
             Snackbar.make(this.view!!, getString(it), Snackbar.LENGTH_LONG).show()
         })
+        _viewModel.showSnackBarAction.observe(this, Observer {
+            Snackbar.make(this.view!!, it, Snackbar.LENGTH_LONG)
+                .setAction(getString(R.string.confirm_btn)) {
+                    _viewModel.navigationCommand.value = NavigationCommand.Back
+                }.show()
+//            Snackbar.make(this.view!!, getString(it), Snackbar.LENGTH_LONG)
+//                .show()
+        })
+
 
         _viewModel.navigationCommand.observe(this, Observer { command ->
             when (command) {

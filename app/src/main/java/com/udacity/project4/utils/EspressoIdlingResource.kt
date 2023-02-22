@@ -1,3 +1,11 @@
+/*
+ * Copyright (c) 2023.
+ * Developed by : Bigad Aboubakr
+ * Developer website : http://bigad.me
+ * Developer github : https://github.com/Scout4all
+ * Developer Email : bigad@bigad.me
+ */
+
 package com.udacity.project4.utils
 
 import androidx.test.espresso.idling.CountingIdlingResource
@@ -19,6 +27,7 @@ object EspressoIdlingResource {
         }
     }
 }
+
 inline fun <T> wrapEspressoIdlingResource(function: () -> T): T {
     EspressoIdlingResource.increment() // Set app as busy.
     return try {

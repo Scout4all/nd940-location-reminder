@@ -1,3 +1,11 @@
+/*
+ * Copyright (c) 2023.
+ * Developed by : Bigad Aboubakr
+ * Developer website : http://bigad.me
+ * Developer github : https://github.com/Scout4all
+ * Developer Email : bigad@bigad.me
+ */
+
 package com.udacity.project4.utils
 
 import android.app.NotificationChannel
@@ -39,11 +47,11 @@ fun sendNotification(context: Context, reminderDataItem: ReminderDataItem) {
         .addNextIntent(intent)
     val notificationPendingIntent = stackBuilder
         .getPendingIntent(getUniqueId(), PendingIntent.FLAG_UPDATE_CURRENT)
-        val notificationContentText = if(reminderDataItem.description.isNullOrEmpty()){
-            "You have entered ${reminderDataItem.location} zone"
-        }else{
-            "You have entered ${reminderDataItem.location} zone to ${reminderDataItem.description}"
-        }
+    val notificationContentText = if (reminderDataItem.description.isNullOrEmpty()) {
+        "You have entered ${reminderDataItem.location} zone"
+    } else {
+        "You have entered ${reminderDataItem.location} zone to ${reminderDataItem.description}"
+    }
 //    build the notification object with the data to be shown
     val notification = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
         .setSmallIcon(R.mipmap.ic_launcher_round)

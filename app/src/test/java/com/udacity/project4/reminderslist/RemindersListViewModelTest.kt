@@ -1,20 +1,24 @@
+/*
+ * Copyright (c) 2023.
+ * Developed by : Bigad Aboubakr
+ * Developer website : http://bigad.me
+ * Developer github : https://github.com/Scout4all
+ * Developer Email : bigad@bigad.me
+ */
+
 package com.udacity.project4.reminderslist
+
 
 import android.app.Application
 import android.os.Build
-
-
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.udacity.project4.utils.MainCoroutineRule
-
 import com.udacity.project4.data.FakeData
-
 import com.udacity.project4.data.FakeDataSource
 import com.udacity.project4.locationreminders.geofence.GeoFenceHelper
 import com.udacity.project4.locationreminders.reminderslist.RemindersListViewModel
+import com.udacity.project4.utils.MainCoroutineRule
 import com.udacity.project4.utils.getOrAwaitValue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.pauseDispatcher
@@ -23,7 +27,6 @@ import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.assertThat
-
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test

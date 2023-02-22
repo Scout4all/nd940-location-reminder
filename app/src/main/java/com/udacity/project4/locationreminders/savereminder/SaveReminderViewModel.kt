@@ -1,3 +1,11 @@
+/*
+ * Copyright (c) 2023.
+ * Developed by : Bigad Aboubakr
+ * Developer website : http://bigad.me
+ * Developer github : https://github.com/Scout4all
+ * Developer Email : bigad@bigad.me
+ */
+
 package com.udacity.project4.locationreminders.savereminder
 
 import android.app.Application
@@ -116,5 +124,19 @@ class SaveReminderViewModel(
 
     }
 
+    fun saveLocation(poi: PointOfInterest) {
+        if (poi.name.isNotEmpty()) {
+            latitude.value = poi.latLng.latitude
+            longitude.value = poi.latLng.longitude
+            selectedPOI.value = poi
+            reminderSelectedLocationStr.value = poi.name
+
+
+            showSnackBarAction.value = "Add ${poi.name} as location to your reminder"
+        } else {
+            showErrorMessage.value = " you need provide name of location"
+        }
+
+    }
 
 }

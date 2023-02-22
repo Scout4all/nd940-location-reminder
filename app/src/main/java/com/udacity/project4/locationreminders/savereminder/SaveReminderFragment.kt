@@ -1,3 +1,11 @@
+/*
+ * Copyright (c) 2023.
+ * Developed by : Bigad Aboubakr
+ * Developer website : http://bigad.me
+ * Developer github : https://github.com/Scout4all
+ * Developer Email : bigad@bigad.me
+ */
+
 package com.udacity.project4.locationreminders.savereminder
 
 import android.os.Bundle
@@ -5,7 +13,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.navArgs
 import com.udacity.project4.R
 import com.udacity.project4.base.BaseFragment
@@ -21,7 +28,7 @@ class SaveReminderFragment : BaseFragment() {
     override val _viewModel: SaveReminderViewModel by inject()
     private lateinit var binding: FragmentSaveReminderBinding
 
-    private val args :SaveReminderFragmentArgs by navArgs()
+    private val args: SaveReminderFragmentArgs by navArgs()
 
 
     override fun onCreateView(
@@ -36,13 +43,13 @@ class SaveReminderFragment : BaseFragment() {
         binding.viewModel = _viewModel
         binding.lifecycleOwner = this
         //check if there is passed args to make fragment behavior editing reminder
-        if(args.dataItem != null){
-            args.dataItem?.let { reminderItem->
-                 _viewModel.getDataItem(reminderItem)
+        if (args.dataItem != null) {
+            args.dataItem?.let { reminderItem ->
+                _viewModel.getDataItem(reminderItem)
                 //change fragment title
                 this.setTitle(reminderItem.title.toString())
-              binding.selectLocation.isClickable = false
-                binding.selectLocation.isEnabled =false
+                binding.selectLocation.isClickable = false
+                binding.selectLocation.isEnabled = false
             }
 
 
@@ -59,13 +66,8 @@ class SaveReminderFragment : BaseFragment() {
             //            Navigate to another fragment to get the user location
 
 
-                if(!_viewModel.reminderTitle.value.isNullOrEmpty()) {
-                    _viewModel.navigationCommand.value =
-                        NavigationCommand.To(SaveReminderFragmentDirections.actionSaveReminderFragmentToSelectLocationFragment())
-                }else{
-                    _viewModel.showSnackBarInt.value = R.string.err_enter_title
-
-                }
+            _viewModel.navigationCommand.value =
+                NavigationCommand.To(SaveReminderFragmentDirections.actionSaveReminderFragmentToSelectLocationFragment())
 
 
         }
@@ -78,8 +80,9 @@ class SaveReminderFragment : BaseFragment() {
             val longitude = _viewModel.longitude.value
             val placeId = _viewModel.selectedPOI.value?.placeId
 
-             val reminderDataItem = ReminderDataItem(title,description,location,latitude,longitude,placeId)
-            _viewModel.validateAndSaveReminder( reminderDataItem)
+            val reminderDataItem =
+                ReminderDataItem(title, description, location, latitude, longitude, placeId)
+            _viewModel.validateAndSaveReminder(reminderDataItem)
         }
 
     }
