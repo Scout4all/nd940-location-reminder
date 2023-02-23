@@ -8,6 +8,8 @@
 
 package com.udacity.project4.utils
 
+import com.udacity.project4.BuildConfig
+
 
 const val REQUEST_TURN_DEVICE_LOCATION_ON = 29
 const val REQUEST_FOREGROUND_AND_BACKGROUND_PERMISSION_RESULT_CODE = 33
@@ -23,7 +25,6 @@ const val SIGN_IN_RESULT_CODE = 1001
 
 const val GEOFENCE_PENDING_INTENT_CODE = 155
 
-const val ACTION_GEOFENCE_EVENT =
-    "GeofenceHelper.project4.action.ACTION_GEOFENCE_EVENT"
+const val ACTION_GEOFENCE_EVENT =BuildConfig.APPLICATION_ID + "ACTION_GEOFENCE_EVENT"
 
 

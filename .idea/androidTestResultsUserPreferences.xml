@@ -60,9 +60,12 @@
             <AndroidTestResultsTableState>
               <option name="preferredColumnWidths">
                 <map>
+                  <entry key="127.0.0.1:21503" value="120" />
                   <entry key="Duration" value="90" />
+                  <entry key="Nexus_5X_API_29" value="120" />
                   <entry key="Pixel_2_API_30" value="120" />
                   <entry key="Tests" value="360" />
+                  <entry key="google&#10; G011A" value="120" />
                 </map>
               </option>
             </AndroidTestResultsTableState>
@@ -113,6 +116,7 @@
               <option name="preferredColumnWidths">
                 <map>
                   <entry key="Duration" value="90" />
+                  <entry key="Nexus_5X_API_29" value="120" />
                   <entry key="Pixel_2_API_30" value="120" />
                   <entry key="Pixel_C_API_33" value="120" />
                   <entry key="Status" value="80" />
@@ -265,6 +269,19 @@
                 <map>
                   <entry key="Duration" value="90" />
                   <entry key="Pixel_2_API_30" value="120" />
+                  <entry key="Tests" value="360" />
+                </map>
+              </option>
+            </AndroidTestResultsTableState>
+          </value>
+        </entry>
+        <entry key="847758857">
+          <value>
+            <AndroidTestResultsTableState>
+              <option name="preferredColumnWidths">
+                <map>
+                  <entry key="Duration" value="90" />
+                  <entry key="Nexus_5X_API_29" value="120" />
                   <entry key="Tests" value="360" />
                 </map>
               </option>
@@ -450,6 +467,7 @@
               <option name="preferredColumnWidths">
                 <map>
                   <entry key="Duration" value="90" />
+                  <entry key="Nexus_5X_API_29" value="120" />
                   <entry key="Pixel_2_API_30" value="120" />
                   <entry key="Pixel_C_API_33" value="120" />
                   <entry key="Status" value="80" />

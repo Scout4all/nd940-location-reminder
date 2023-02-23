@@ -58,8 +58,9 @@ import org.koin.test.get
 @LargeTest
 //END TO END test to black box test the app
 class RemindersActivityTest :
-    KoinTest {// Extended Koin Test - embed autoclose @after method to close Koin after every test
-
+    KoinTest {
+    // Extended Koin Test - embed autoclose @after method to close Koin after every test
+    //ToDo fix tests and add toast test
 
     private val device = UiDevice.getInstance(getInstrumentation())
 
@@ -136,7 +137,7 @@ class RemindersActivityTest :
     //clean database after finish test
     @After
     fun resetDatabase() = runBlocking {
-        repository.deleteAllReminders()
+//        repository.deleteAllReminders()
     }
 
     private val dataBindingIdlingResource = DataBindingIdlingResource()

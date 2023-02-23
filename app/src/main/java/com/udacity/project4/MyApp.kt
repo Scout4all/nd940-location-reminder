@@ -65,7 +65,7 @@ class MyApp : Application() {
             }
             single { RemindersLocalRepository(get()) as ReminderDataSource }
             single { LocalDB.createRemindersDao(this@MyApp) }
-            single { GeoFenceHelper(this@MyApp) }
+            single { GeoFenceHelper(get()) }
 
         }
 

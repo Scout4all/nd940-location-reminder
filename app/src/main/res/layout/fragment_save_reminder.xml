@@ -17,6 +17,9 @@
             name="viewModel"
             type="com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel" />
     </data>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -73,17 +76,7 @@
             app:layout_constraintTop_toTopOf="@id/selectLocation"
             tools:text="Location" />
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/saveReminder"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/margin_normal"
-            android:fadeVisible="@{!viewModel.showLoading.booleanValue()}"
-            android:src="@drawable/ic_save"
-            app:fabSize="normal"
-            app:layout_anchorGravity="bottom|right|end"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+
 
         <ProgressBar
             android:id="@+id/progressBar"
@@ -96,4 +89,17 @@
             app:layout_constraintStart_toStartOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/saveReminder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_normal"
+        android:fadeVisible="@{!viewModel.showLoading.booleanValue()}"
+        android:src="@drawable/ic_save"
+        app:fabSize="normal"
+        android:layout_gravity="end|bottom"
+         app:layout_anchorGravity="bottom|right|end"
+          />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

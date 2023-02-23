@@ -21,35 +21,23 @@ import com.udacity.project4.utils.GEOFENCE_PENDING_INTENT_CODE
 import timber.log.Timber
 
 @SuppressLint("InlinedApi", "UnspecifiedImmutableFlag")
-class GeoFenceHelper(base: Application?) : ContextWrapper(base) {
+class GeoFenceHelper(val base: Application)  :ContextWrapper(base) {
 
-    private val geofencingClient: GeofencingClient = LocationServices.getGeofencingClient(base!!)
+    private val geofencingClient: GeofencingClient = LocationServices.getGeofencingClient(base.applicationContext)
 
     private val geofenceIntent: PendingIntent by lazy {
         val runningSOrLater = android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S
-        val intent = Intent(base, GeofenceBroadcastReceiver::class.java)
+        val intent = Intent(base.applicationContext, GeofenceBroadcastReceiver::class.java)
         intent.action = ACTION_GEOFENCE_EVENT
-        when (runningSOrLater) {
-            true -> {
-                PendingIntent.getBroadcast(
-                    base,
-                    GEOFENCE_PENDING_INTENT_CODE,
-                    intent,
-                    PendingIntent.FLAG_MUTABLE
-                )
 
-            }
-            false -> {
                 PendingIntent.getBroadcast(
-                    base,
+                    base.applicationContext,
                     GEOFENCE_PENDING_INTENT_CODE,
                     intent,
                     PendingIntent.FLAG_UPDATE_CURRENT
                 )
 
-            }
 
-        }
 
     }
 

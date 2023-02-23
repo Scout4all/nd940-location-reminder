@@ -28,6 +28,8 @@ import timber.log.Timber
 
 class GeofenceBroadcastReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
+
+        Timber.e("Bigad ${intent.data.toString()}")
         if (intent.action == ACTION_GEOFENCE_EVENT) {
             val geofencingEvent: GeofencingEvent = GeofencingEvent.fromIntent(intent)!!
 

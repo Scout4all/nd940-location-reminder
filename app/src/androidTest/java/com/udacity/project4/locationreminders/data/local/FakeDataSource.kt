@@ -25,6 +25,7 @@ class FakeDataSource(val reminders: MutableList<ReminderDTO>? = mutableListOf())
     }
 
     override suspend fun getReminders(): Result<List<ReminderDTO>> {
+
         if (!hasErrors) {
             reminders?.let {
                 return Result.Success(ArrayList(it))

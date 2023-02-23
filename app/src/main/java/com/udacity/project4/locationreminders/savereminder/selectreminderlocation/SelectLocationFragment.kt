@@ -11,12 +11,18 @@ package com.udacity.project4.locationreminders.savereminder.selectreminderlocati
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.graphics.Color
 import android.location.Location
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.view.*
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.google.android.gms.location.*
@@ -26,6 +32,8 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.android.gms.tasks.Task
+import com.google.android.material.snackbar.Snackbar
+import com.udacity.project4.BuildConfig
 import com.udacity.project4.R
 import com.udacity.project4.base.BaseFragment
 import com.udacity.project4.databinding.FragmentSelectLocationBinding
@@ -71,11 +79,51 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-        getCurrentLocation(googleMap)
-        getCurrentLocation(googleMap)
+
+        grantLocation()
         onLocationSelected(googleMap)
         setMapStyle(googleMap)
         setOnMapClick(googleMap)
+
+
+    }
+
+    private fun grantLocation() {
+
+           locationPermissionRequest.launch(arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION))
+
+    }
+
+
+
+    val locationPermissionRequest = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            when {
+                ( permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) &&
+                        permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false))-> {
+                    getCurrentLocation(mMap)
+                 }
+                else -> {
+
+                    Snackbar.make(
+                        binding.root,
+                        R.string.permission_denied_explanation,
+                        Snackbar.LENGTH_INDEFINITE
+                    )
+                        .setAction(R.string.settings) {
+                            startActivity(Intent().apply {
+                                action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+                                data = Uri.fromParts("package", BuildConfig.APPLICATION_ID, null)
+                                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                            })
+                        }.show()
+            }
+            }
+        }
     }
 
     private fun onLocationSelected(map: GoogleMap) {
@@ -90,6 +138,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
             )
             addCircle(poi.latLng)
+
             _viewModel.saveLocation(poi)
         }
     }
@@ -224,4 +273,9 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
             Timber.e(e.message)
         }
     }
+
+
+
+
+
 }
