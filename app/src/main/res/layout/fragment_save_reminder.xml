@@ -31,7 +31,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/reminder_title"
-            android:text="@={viewModel.reminderTitle}"
+            android:text="@={viewModel.dataItem.title}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -43,7 +43,7 @@
             android:gravity="start"
             android:hint="@string/reminder_desc"
             android:lines="10"
-            android:text="@={viewModel.reminderDescription}"
+            android:text="@={viewModel.dataItem.description}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/reminderTitle" />
@@ -69,7 +69,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/margin_normal"
             android:layout_marginRight="@dimen/margin_normal"
-            android:text="@{viewModel.reminderSelectedLocationStr}"
+            android:text="@{viewModel.dataItem.location}"
             android:textColor="@color/black"
             app:layout_constraintBottom_toBottomOf="@id/selectLocation"
             app:layout_constraintEnd_toEndOf="parent"

@@ -13,6 +13,7 @@ import android.os.Build
 import android.provider.Settings
 import android.provider.Settings.SettingNotFoundException
 import android.widget.EditText
+import androidx.annotation.NonNull
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso
@@ -27,6 +28,9 @@ import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.*
 import com.google.android.apps.common.testing.accessibility.framework.replacements.TextUtils
+import com.google.firebase.FirebaseApp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.udacity.project4.data.FakeData
 import com.udacity.project4.locationreminders.ReminderDescriptionViewModel
 import com.udacity.project4.locationreminders.RemindersActivity
@@ -41,6 +45,7 @@ import com.udacity.project4.util.DataBindingIdlingResource
 import com.udacity.project4.util.monitorActivity
 import com.udacity.project4.utils.EspressoIdlingResource
 import kotlinx.coroutines.runBlocking
+import org.hamcrest.CoreMatchers.`is`
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -52,6 +57,8 @@ import org.koin.core.context.stopKoin
 import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.get
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.`when`
 
 
 @RunWith(AndroidJUnit4::class)
@@ -109,6 +116,7 @@ class RemindersActivityTest :
             single { RemindersLocalRepository(get()) as ReminderDataSource }
             single { LocalDB.createRemindersDao(appContext) }
             single { GeoFenceHelper(appContext) }
+            single { FirebaseAuth.getInstance() }
         }
         //declare a new koin module
         startKoin {
@@ -171,6 +179,39 @@ class RemindersActivityTest :
     }
 
     @Test
+    fun login()  {
+
+        val mockFirebaseUser: FirebaseUser = mock(FirebaseUser::class.java)
+
+        `when`(mockFirebaseUser.uid).thenReturn("uTZpVPPz8NT2LOvP4ufjs1L6r3P2")
+        `when`(mockFirebaseUser.displayName).thenReturn("Bigad")
+        val firebaseMock  = mock(FirebaseAuth::class.java)
+        ServiceLocator.auth = firebaseMock
+
+        `when`(firebaseMock.currentUser).thenReturn(mockFirebaseUser)
+
+        val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
+
+//        //Todo add login
+
+
+device.waitForIdle(50000)
+        Thread.sleep(5000)
+
+        assertThat(mockFirebaseUser.uid,`is`("uTZpVPPz8NT2LOvP4ufjs1L6r3P2"))
+
+
+        activityScenario.close()
+
+    }
+
+     @NonNull
+    fun initAndReturnFirebaseAuth(): FirebaseAuth? {
+        FirebaseApp.initializeApp(appContext)
+        val firebaseAuth = FirebaseAuth.getInstance()
+         return firebaseAuth
+    }
+    @Test
     fun addReminderTest_notSelectedLocationErrors_ResultShowToastSnakeBar() {
         val reminderData = FakeData.remindersDTOList.get(0)
         val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
@@ -216,9 +257,9 @@ class RemindersActivityTest :
         )
 
         if (editText.exists()) {
-            onView(withId(R.id.hy)).perform(typeText(reminderData.description))
+            onView(withId(R.id.location_name_et)).perform(typeText(reminderData.description))
             Espresso.closeSoftKeyboard()
-            onView(withId(R.id.add_title)).perform(click())
+            onView(withId(R.id.save_location_title_btn)).perform(click())
 
 
         }

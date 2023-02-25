@@ -10,9 +10,7 @@ package com.udacity.project4.locationreminders.savereminder.selectreminderlocati
 
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.graphics.Color
 import android.location.Location
@@ -22,9 +20,8 @@ import android.os.Bundle
 import android.provider.Settings
 import android.view.*
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
-import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -42,7 +39,7 @@ import com.udacity.project4.utils.DEFAULT_ZOOM
 import com.udacity.project4.utils.LOCATION_DEFAULT_RADIUS
 import com.udacity.project4.utils.hideKeyboard
 import com.udacity.project4.utils.setDisplayHomeAsUpEnabled
-import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import timber.log.Timber
 import java.util.*
 
@@ -50,9 +47,11 @@ import java.util.*
 class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
     private lateinit var mMapFragment: SupportMapFragment
+    private   val mIsLocationGranted = MutableLiveData(false)
 
     //Use Koin to get the view model of the SaveReminder
-    override val _viewModel: SaveReminderViewModel by inject()
+
+    override val _viewModel: SaveReminderViewModel by activityViewModel()
     private lateinit var binding: FragmentSelectLocationBinding
     private lateinit var mMap: GoogleMap
 
@@ -69,7 +68,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
         setHasOptionsMenu(true)
         setDisplayHomeAsUpEnabled(true)
-
+        grantLocation()
         mMapFragment = (childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?)!!
         mMapFragment.getMapAsync(this)
 
@@ -80,112 +79,82 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-        grantLocation()
-        onLocationSelected(googleMap)
+        mIsLocationGranted.observe(viewLifecycleOwner) {
+            getCurrentLocation(googleMap, it)
+        }
+
         setMapStyle(googleMap)
-        setOnMapClick(googleMap)
+        onMapClick(googleMap)
+        onPoiClicked(googleMap)
+
 
 
     }
 
     private fun grantLocation() {
 
-           locationPermissionRequest.launch(arrayOf(
+        locationPermissionRequest.launch(
+            arrayOf(
                 Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION))
-
-    }
-
-
-
-    val locationPermissionRequest = registerForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissions ->
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            when {
-                ( permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) &&
-                        permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false))-> {
-                    getCurrentLocation(mMap)
-                 }
-                else -> {
-
-                    Snackbar.make(
-                        binding.root,
-                        R.string.permission_denied_explanation,
-                        Snackbar.LENGTH_INDEFINITE
-                    )
-                        .setAction(R.string.settings) {
-                            startActivity(Intent().apply {
-                                action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-                                data = Uri.fromParts("package", BuildConfig.APPLICATION_ID, null)
-                                flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                            })
-                        }.show()
-            }
-            }
-        }
-    }
-
-    private fun onLocationSelected(map: GoogleMap) {
-
-        map.setOnPoiClickListener { poi ->
-            binding.hy.visibility = View.GONE
-            binding.addTitle.visibility = View.GONE
-            map.clear()
-            map.addMarker(
-                MarkerOptions().position(poi.latLng).title(poi.name)
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
-
+                Manifest.permission.ACCESS_COARSE_LOCATION
             )
-            addCircle(poi.latLng)
+        )
 
-            _viewModel.saveLocation(poi)
+    }
+
+
+
+    private fun onPoiClicked(map: GoogleMap) {
+        map.setOnPoiClickListener { poi ->
+            binding.inputsContainer.visibility = View.GONE
+            map.clear()
+            addMapMarker(map,poi.latLng,poi.name)
+            _viewModel.confirmAddLocation(poi.latLng,poi.name)
         }
     }
 
-    private fun setOnMapClick(googleMap: GoogleMap) {
+
+    private fun onMapClick(googleMap: GoogleMap) {
         googleMap.setOnMapClickListener { latLng ->
             googleMap.clear()
-            binding.hy.text.clear()
-            binding.hy.visibility = View.VISIBLE
-            binding.addTitle.visibility = View.VISIBLE
+            binding.locationNameEt.text.clear()
+            binding.inputsContainer.visibility = View.VISIBLE
 
-            googleMap.addMarker(
-                MarkerOptions().position(latLng).title(binding.hy.text.toString())
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
-
-            )
-            addCircle(latLng)
-
-            binding.addTitle.setOnClickListener {
+            val placeName = binding.locationNameEt.text.trim().toString()
+            addMapMarker(googleMap,latLng,placeName)
+            binding.saveLocationTitleBtn.setOnClickListener {
+                binding.inputsContainer.visibility= View.GONE
                 it.let { activity?.hideKeyboard(it) }
-                val pointOfInterest = PointOfInterest(
-                    LatLng(latLng.latitude, latLng.longitude), UUID.randomUUID().toString(),
-                    binding.hy.text.toString()
-                )
-                _viewModel.saveLocation(pointOfInterest)
+                _viewModel.confirmAddLocation(latLng,placeName)
             }
 
         }
     }
 
+private fun addMapMarker(map:GoogleMap,latLng:LatLng,title:String){
+    map.addMarker(
+        MarkerOptions().position(latLng).title(title)
+            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
 
-    private fun addCircle(latLng: LatLng, radius: Float = LOCATION_DEFAULT_RADIUS) {
+    )
+    addCircle(map, latLng)
+}
+
+    private fun addCircle(map: GoogleMap,latLng: LatLng, radius: Float = LOCATION_DEFAULT_RADIUS) {
         val circleOptions = CircleOptions()
         circleOptions.radius(radius.toDouble())
         circleOptions.center(latLng)
         circleOptions.strokeColor(Color.argb(255, 0, 255, 0))
         circleOptions.fillColor(Color.argb(64, 0, 255, 0))
         circleOptions.strokeWidth(4f)
-        mMap.addCircle(circleOptions)
-
-
+        map.addCircle(circleOptions)
     }
 
     @Deprecated("Deprecated in Java")
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.map_options, menu)
     }
+
 
     @Deprecated("Deprecated in Java")
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
@@ -211,48 +180,45 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         else -> super.onOptionsItemSelected(item)
     }
 
-    @Suppress("DEPRECATED_IDENTITY_EQUALS")
-    private fun isPermissionGranted(): Boolean {
-        return ContextCompat.checkSelfPermission(
-            requireContext(), Manifest.permission.ACCESS_FINE_LOCATION
-        ) === PackageManager.PERMISSION_GRANTED
 
-    }
-
-
-    @SuppressLint("MissingPermission")
-    private fun getCurrentLocation(map: GoogleMap) {
+    private fun getCurrentLocation(map: GoogleMap , isLocationGranted : Boolean) {
         var lastKnownLocation: Location?
 
         val fusedLocationProviderClient: FusedLocationProviderClient =
             LocationServices.getFusedLocationProviderClient(requireActivity())
         try {
-            if (isPermissionGranted()) {
-                map.isMyLocationEnabled = true
-                val locationResult: Task<Location> = fusedLocationProviderClient.lastLocation
-                locationResult.addOnCompleteListener(requireActivity()) { task ->
-                    if (task.isSuccessful) {
-                        // Set the map's camera position to the current location of the device.
-                        lastKnownLocation = task.result
-                        if (lastKnownLocation != null) {
+                if (isLocationGranted) {
+                    map.isMyLocationEnabled = isLocationGranted
+                    val locationResult: Task<Location> = fusedLocationProviderClient.lastLocation
+                    locationResult.addOnCompleteListener(requireActivity()) { task ->
+                        if (task.isSuccessful) {
+                            // Set the map's camera position to the current location of the device.
+                            lastKnownLocation = task.result
+                            if (lastKnownLocation != null) {
+                                map.moveCamera(
+                                    CameraUpdateFactory.newLatLngZoom(
+                                        LatLng(
+                                            lastKnownLocation!!.latitude,
+                                            lastKnownLocation!!.longitude
+                                        ), DEFAULT_ZOOM
+                                    )
+                                )
+                            }
+                        } else {
+                            Timber.d("Current location is null. Using defaults.")
+                            Timber.e("Exception: %s", task.exception)
                             map.moveCamera(
                                 CameraUpdateFactory.newLatLngZoom(
-                                    LatLng(
-                                        lastKnownLocation!!.latitude, lastKnownLocation!!.longitude
-                                    ), DEFAULT_ZOOM
+                                    DEFAULT_LOCATION_LATLNG,
+                                    DEFAULT_ZOOM
                                 )
                             )
+                            map.uiSettings.isMyLocationButtonEnabled = isLocationGranted
                         }
-                    } else {
-                        Timber.d("Current location is null. Using defaults.")
-                        Timber.e("Exception: %s", task.exception)
-                        map.moveCamera(
-                            CameraUpdateFactory.newLatLngZoom(DEFAULT_LOCATION_LATLNG, DEFAULT_ZOOM)
-                        )
-                        map.uiSettings.isMyLocationButtonEnabled = false
                     }
-                }
+
             }
+
         } catch (e: SecurityException) {
             Timber.e(e.message, e)
         }
@@ -274,8 +240,34 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         }
     }
 
-
-
-
+    private val locationPermissionRequest = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            when {
+                (permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) &&
+                        permissions.getOrDefault(
+                            Manifest.permission.ACCESS_COARSE_LOCATION,
+                            false
+                        )) -> {
+                    mIsLocationGranted.value=true
+                }
+                else -> {
+                    Snackbar.make(
+                        binding.root,
+                        R.string.permission_denied_explanation,
+                        Snackbar.LENGTH_INDEFINITE
+                    )
+                        .setAction(R.string.settings) {
+                            startActivity(Intent().apply {
+                                action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+                                data = Uri.fromParts("package", BuildConfig.APPLICATION_ID, null)
+                                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                            })
+                        }.show()
+                }
+            }
+        }
+    }
 
 }

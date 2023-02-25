@@ -21,8 +21,9 @@ import com.google.firebase.ktx.Firebase
 import com.udacity.project4.R
 import com.udacity.project4.authentication.AuthenticationActivity
 import com.udacity.project4.databinding.ActivityReminderDescriptionBinding
-import com.udacity.project4.locationreminders.reminderslist.ReminderDataItem
+import com.udacity.project4.domain.ReminderDataItem
 import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
 /**
@@ -42,7 +43,7 @@ class ReminderDescriptionActivity : AppCompatActivity() {
     }
 
     private lateinit var binding: ActivityReminderDescriptionBinding
-    private val _viewModel: ReminderDescriptionViewModel by inject()
+    private val _viewModel: ReminderDescriptionViewModel by viewModel()
     private var reminderItem: ReminderDataItem? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

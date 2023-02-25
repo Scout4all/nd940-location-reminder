@@ -38,8 +38,11 @@
             app:destination="@id/selectLocationFragment" />
         <argument
             android:name="dataItem"
-            app:argType="com.udacity.project4.locationreminders.reminderslist.ReminderDataItem"
-            app:nullable="true" />
+            app:argType="com.udacity.project4.domain.ReminderDataItem"
+            app:nullable="true"
+            android:defaultValue="@null"
+              />
+
 
     </fragment>
     <fragment

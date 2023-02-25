@@ -9,6 +9,7 @@
 package com.udacity.project4.locationreminders.savereminder
 
 import android.Manifest
+import android.app.Activity
 import android.content.Intent
 import android.content.IntentSender
 import android.net.Uri
@@ -18,6 +19,7 @@ import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.databinding.DataBindingUtil
@@ -32,20 +34,17 @@ import com.udacity.project4.R
 import com.udacity.project4.base.BaseFragment
 import com.udacity.project4.base.NavigationCommand
 import com.udacity.project4.databinding.FragmentSaveReminderBinding
-import com.udacity.project4.locationreminders.reminderslist.ReminderDataItem
-import com.udacity.project4.utils.REQUEST_TURN_DEVICE_LOCATION_ON
 import com.udacity.project4.utils.setDisplayHomeAsUpEnabled
-import com.udacity.project4.utils.setTitle
-import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import timber.log.Timber
 
 class SaveReminderFragment : BaseFragment() {
     //Get the view model this time as a single to be shared with the another fragment
-    override val _viewModel: SaveReminderViewModel by inject()
+    override val _viewModel: SaveReminderViewModel by activityViewModel()
     private lateinit var binding: FragmentSaveReminderBinding
 
     private val args: SaveReminderFragmentArgs by navArgs()
-
+private var isLocationPermissionGranted = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -60,18 +59,16 @@ class SaveReminderFragment : BaseFragment() {
         binding.lifecycleOwner = this
         //check if there is passed args to make fragment behavior editing reminder
         if (args.dataItem != null) {
-            args.dataItem?.let { reminderItem ->
-                _viewModel.getDataItem(reminderItem)
-                //change fragment title
-                this.setTitle(reminderItem.title.toString())
-                binding.selectLocation.isClickable = false
-                binding.selectLocation.isEnabled = false
-            }
-
-
+            _viewModel.dataItem.value = args.dataItem
         }
 
         return binding.root
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        _viewModel.onClear()
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -79,59 +76,38 @@ class SaveReminderFragment : BaseFragment() {
         binding.lifecycleOwner = this
 
         binding.selectLocation.setOnClickListener {
-            //            Navigate to another fragment to get the user location
+            //  Navigate to another fragment to get the user location
             _viewModel.navigationCommand.value =
                 NavigationCommand.To(SaveReminderFragmentDirections.actionSaveReminderFragmentToSelectLocationFragment())
-
 
         }
 
         binding.saveReminder.setOnClickListener {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 locationPermissionRequest.launch(
-                    arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION,
-                    Manifest.permission.ACCESS_FINE_LOCATION)
+                    arrayOf(
+                        Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    )
                 )
             }
-                makeReminder ()
-
 
 
         }
 
     }
 
-    private fun makeReminder (){
-        val title = _viewModel.reminderTitle.value
-        val description = _viewModel.reminderDescription.value
-        val location = _viewModel.reminderSelectedLocationStr.value
-        val latitude = _viewModel.latitude.value
-        val longitude = _viewModel.longitude.value
-        val placeId = _viewModel.selectedPOI.value?.placeId
-
-        val reminderDataItem =
-            ReminderDataItem(title, description, location, latitude, longitude, placeId)
-        _viewModel.validateAndSaveReminder(reminderDataItem)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        //make sure to clear the view model after destroy, as it's a single view model.
-        _viewModel.onClear()
-    }
 
     @RequiresApi(Build.VERSION_CODES.N)
     val locationPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         when {
-
             (permissions.getOrDefault(Manifest.permission.ACCESS_BACKGROUND_LOCATION, false)
                     && permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false))
             -> {
-//                makeReminder ()
-                checkDeviceLocationSettingsAndStartGeofence()
-             }
+                isLocationPermissionGranted
+            }
             else -> {
                 Snackbar.make(
                     binding.root,
@@ -145,25 +121,42 @@ class SaveReminderFragment : BaseFragment() {
                             flags = Intent.FLAG_ACTIVITY_NEW_TASK
                         })
                     }.show()
+            }
         }
+        checkDeviceLocationSettingsAndStartGeofence()
+    }
+
+
+
+    var locationServiceEnabledResult = registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK ) {
+            checkDeviceLocationSettingsAndStartGeofence(false)
+        }else{
+            Snackbar.make(
+                binding.root,
+                R.string.location_required_error, Snackbar.LENGTH_LONG
+            ).setAction(android.R.string.ok) {
+                checkDeviceLocationSettingsAndStartGeofence()
+            }.show()
         }
     }
 
-        private fun checkDeviceLocationSettingsAndStartGeofence(resolve: Boolean = true) {
+    private fun checkDeviceLocationSettingsAndStartGeofence(resolve: Boolean = true)   {
         val locationRequest = LocationRequest.create().apply {
-            priority = LocationRequest.PRIORITY_LOW_POWER
+                this.priority = LocationRequest.PRIORITY_LOW_POWER
         }
         val builder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest)
         val settingsClient = LocationServices.getSettingsClient(requireActivity())
         val locationSettingsResponseTask =
             settingsClient.checkLocationSettings(builder.build())
+
         locationSettingsResponseTask.addOnFailureListener { exception ->
             if (exception is ResolvableApiException && resolve) {
                 try {
-                    exception.startResolutionForResult(
-                        requireActivity(),
-                        REQUEST_TURN_DEVICE_LOCATION_ON
-                    )
+                    val intentSenderRequest = IntentSenderRequest
+                        .Builder(exception.resolution).build()
+                    locationServiceEnabledResult.launch(intentSenderRequest)
+
                 } catch (sendEx: IntentSender.SendIntentException) {
                     Timber.e("Error getting location settings resolution: " + sendEx.message)
                 }
@@ -175,7 +168,12 @@ class SaveReminderFragment : BaseFragment() {
                     checkDeviceLocationSettingsAndStartGeofence()
                 }.show()
             }
+        } .addOnCompleteListener {
+
+            _viewModel.validateAndSaveReminder(isLocationPermissionGranted,it.isSuccessful)
+
         }
+
 
     }
 }

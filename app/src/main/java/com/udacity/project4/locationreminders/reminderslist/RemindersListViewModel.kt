@@ -12,9 +12,11 @@ import android.app.Application
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.udacity.project4.base.BaseViewModel
+import com.udacity.project4.domain.ReminderDataItem
 import com.udacity.project4.locationreminders.data.ReminderDataSource
 import com.udacity.project4.locationreminders.data.dto.ReminderDTO
 import com.udacity.project4.locationreminders.data.dto.Result
+import com.udacity.project4.locationreminders.data.dto.asReminderDataItemsList
 import com.udacity.project4.locationreminders.geofence.GeoFenceHelper
 import kotlinx.coroutines.launch
 
@@ -45,17 +47,7 @@ class RemindersListViewModel(
             when (result) {
                 is Result.Success<*> -> {
                     val dataList = ArrayList<ReminderDataItem>()
-                    dataList.addAll((result.data as List<ReminderDTO>).map { reminder ->
-                        //map the reminder data from the DB to the be ready to be displayed on the UI
-                        ReminderDataItem(
-                            reminder.title,
-                            reminder.description,
-                            reminder.location,
-                            reminder.latitude,
-                            reminder.longitude,
-                            reminder.id
-                        )
-                    })
+                    dataList.addAll((result.data as List<ReminderDTO>).asReminderDataItemsList())
                     remindersList.value = dataList
                 }
                 is Result.Error ->

@@ -12,16 +12,14 @@ import android.app.Application
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.PointOfInterest
 import com.udacity.project4.R
 import com.udacity.project4.base.BaseViewModel
 import com.udacity.project4.base.NavigationCommand
 import com.udacity.project4.locationreminders.data.ReminderDataSource
-import com.udacity.project4.locationreminders.data.dto.ReminderDTO
 import com.udacity.project4.locationreminders.geofence.GeoFenceHelper
-import com.udacity.project4.locationreminders.reminderslist.ReminderDataItem
+import com.udacity.project4.domain.ReminderDataItem
+import com.udacity.project4.domain.asReminderDataObject
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 class SaveReminderViewModel(
     val app: Application,
@@ -30,37 +28,37 @@ class SaveReminderViewModel(
 ) :
     BaseViewModel(app) {
 
-    val reminderTitle = MutableLiveData<String?>()
-    val reminderDescription = MutableLiveData<String?>()
-    val reminderSelectedLocationStr = MutableLiveData<String?>()
-    val selectedPOI = MutableLiveData<PointOfInterest?>()
-    val latitude = MutableLiveData<Double?>()
-    val longitude = MutableLiveData<Double?>()
+    val dataItem = MutableLiveData<ReminderDataItem?>()
+    init {
+        dataItem.value = ReminderDataItem(null,null,null,null,null)
+    }
 
     /**
      * Clear the live data objects to start fresh next time the view model gets called
      */
     fun onClear() {
-        reminderTitle.value = null
-        reminderDescription.value = null
-        reminderSelectedLocationStr.value = null
-        selectedPOI.value = null
-        latitude.value = null
-        longitude.value = null
+        dataItem.value = null
     }
+
 
     /**
      * Validate the entered data then saves the reminder data to the DataSource
      */
-    fun validateAndSaveReminder(reminderData: ReminderDataItem) {
-        if (validateEnteredData(reminderData)) {
-            geoFenceHelper.addGeoFence(
-                reminderData.latitude!!.toDouble(),
-                reminderData.longitude!!.toDouble(),
-                placeId = reminderData.id
-            )
-            saveReminder(reminderData)
+    fun validateAndSaveReminder(addGeofence: Boolean, locationEnabled: Boolean) {
+        dataItem.value?.let { reminderData->
+            if (validateEnteredData(reminderData)) {
+                if(addGeofence && locationEnabled) {
+                    geoFenceHelper.addGeoFence(
+                        reminderData.latitude!!.toDouble(),
+                        reminderData.longitude!!.toDouble(),
+                        placeId = reminderData.id.toString()
+                    )
+                    showSnackBar.value = "Geofence Added"
+                }
+                saveReminder(reminderData)
+            }
         }
+
     }
 
     /**
@@ -69,16 +67,7 @@ class SaveReminderViewModel(
     fun saveReminder(reminderData: ReminderDataItem) {
         showLoading.value = true
         viewModelScope.launch {
-            dataSource.saveReminder(
-                ReminderDTO(
-                    reminderData.title,
-                    reminderData.description,
-                    reminderData.location,
-                    reminderData.latitude,
-                    reminderData.longitude,
-                    reminderData.id!!
-                )
-            )
+            dataSource.saveReminder(reminderData.asReminderDataObject())
             showLoading.value = false
             showToast.value = app.getString(R.string.reminder_saved)
             navigationCommand.value = NavigationCommand.Back
@@ -102,42 +91,21 @@ class SaveReminderViewModel(
         return true
     }
 
-    fun getDataItem(reminderItem: ReminderDataItem) {
 
-        val latLng = LatLng(reminderItem.latitude!!, reminderItem.longitude!!)
-
-        Timber.e(reminderItem.location)
-
-        reminderTitle.value = reminderItem.title
-        reminderDescription.value = reminderItem.description
-        if (reminderSelectedLocationStr.value.isNullOrEmpty()) {
-            reminderSelectedLocationStr.value = reminderItem.location
-            latitude.value = reminderItem.latitude
-            longitude.value = reminderItem.longitude
-            selectedPOI.value = PointOfInterest(
-                latLng,
-                reminderItem.id.toString(),
-                reminderItem.location.toString()
-            )
+    fun confirmAddLocation(latLng: LatLng,placeName:String) {
+        dataItem.value?.location = if(placeName.isNotEmpty()){
+            placeName
+        }else{
+            "Dropped Marker"
         }
 
+        dataItem.value?.latitude =  latLng.latitude
+        dataItem.value?.longitude =  latLng.longitude
+
+
+        showSnackBarAction.value = "Add ${placeName} as location to your reminder"
 
     }
 
-    fun saveLocation(poi: PointOfInterest) {
-        if (poi.name.isNotEmpty()) {
-            reminderSelectedLocationStr.value = poi.name
-        } else {
-            reminderSelectedLocationStr.value = "Dropped Marker"
-        }
-        latitude.value = poi.latLng.latitude
-        longitude.value = poi.latLng.longitude
-        selectedPOI.value = poi
-
-
-
-        showSnackBarAction.value = "Add ${poi.name} as location to your reminder"
-
-    }
 
 }

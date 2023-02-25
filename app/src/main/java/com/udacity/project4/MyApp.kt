@@ -9,6 +9,9 @@
 package com.udacity.project4
 
 import android.app.Application
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.udacity.project4.locationreminders.ReminderDescriptionViewModel
 import com.udacity.project4.locationreminders.data.ReminderDataSource
 import com.udacity.project4.locationreminders.data.local.LocalDB
@@ -16,6 +19,7 @@ import com.udacity.project4.locationreminders.data.local.RemindersLocalRepositor
 import com.udacity.project4.locationreminders.geofence.GeoFenceHelper
 import com.udacity.project4.locationreminders.reminderslist.RemindersListViewModel
 import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
+import org.koin.android.ext.android.getKoin
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.startKoin
@@ -44,7 +48,7 @@ class MyApp : Application() {
             }
 
             //Declare singleton definitions to be later injected using by inject()
-            single {
+            viewModel {
                 //This view model is declared singleton to be used across multiple fragments
                 SaveReminderViewModel(
                     get(),
@@ -54,7 +58,7 @@ class MyApp : Application() {
                 )
             }
 
-            single {
+            viewModel {
                 //This view model is declared singleton to be used across multiple fragments
                 ReminderDescriptionViewModel(
                     get(),
@@ -67,7 +71,9 @@ class MyApp : Application() {
             single { LocalDB.createRemindersDao(this@MyApp) }
             single { GeoFenceHelper(get()) }
 
+
         }
+
 
         startKoin {
             androidContext(this@MyApp)
