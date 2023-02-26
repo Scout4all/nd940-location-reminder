@@ -38,6 +38,8 @@ class SaveReminderViewModel(
      */
     fun onClear() {
         dataItem.value = null
+        dataItem.value = ReminderDataItem(null,null,null,null,null)
+
     }
 
 
@@ -47,14 +49,14 @@ class SaveReminderViewModel(
     fun validateAndSaveReminder(addGeofence: Boolean, locationEnabled: Boolean) {
         dataItem.value?.let { reminderData->
             if (validateEnteredData(reminderData)) {
-                if(addGeofence && locationEnabled) {
+
                     geoFenceHelper.addGeoFence(
                         reminderData.latitude!!.toDouble(),
                         reminderData.longitude!!.toDouble(),
                         placeId = reminderData.id.toString()
                     )
-                    showSnackBar.value = "Geofence Added"
-                }
+                    showToast.value = "Geofence Added"
+
                 saveReminder(reminderData)
             }
         }
@@ -64,7 +66,7 @@ class SaveReminderViewModel(
     /**
      * Save the reminder to the data source
      */
-    fun saveReminder(reminderData: ReminderDataItem) {
+   private fun saveReminder(reminderData: ReminderDataItem) {
         showLoading.value = true
         viewModelScope.launch {
             dataSource.saveReminder(reminderData.asReminderDataObject())
@@ -77,7 +79,7 @@ class SaveReminderViewModel(
     /**
      * Validate the entered data and show error to the user if there's any invalid data
      */
-    fun validateEnteredData(reminderData: ReminderDataItem): Boolean {
+ private   fun validateEnteredData(reminderData: ReminderDataItem): Boolean {
         if (reminderData.title.isNullOrEmpty()) {
             showSnackBarInt.value = R.string.err_enter_title
 
@@ -92,7 +94,7 @@ class SaveReminderViewModel(
     }
 
 
-    fun confirmAddLocation(latLng: LatLng,placeName:String) {
+    fun confirmAddLocation(latLng: LatLng,placeName:String = "") {
         dataItem.value?.location = if(placeName.isNotEmpty()){
             placeName
         }else{
@@ -103,7 +105,7 @@ class SaveReminderViewModel(
         dataItem.value?.longitude =  latLng.longitude
 
 
-        showSnackBarAction.value = "Add ${placeName} as location to your reminder"
+        showSnackBarAction.value = "Add ${dataItem.value?.location} as location to your reminder"
 
     }
 

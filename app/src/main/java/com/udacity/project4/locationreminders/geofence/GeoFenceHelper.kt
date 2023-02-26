@@ -11,6 +11,7 @@ package com.udacity.project4.locationreminders.geofence
 import android.annotation.SuppressLint
 import android.app.Application
 import android.app.PendingIntent
+import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
 import com.google.android.gms.common.api.ApiException
@@ -21,14 +22,14 @@ import com.udacity.project4.utils.GEOFENCE_PENDING_INTENT_CODE
 import timber.log.Timber
 
 @SuppressLint("InlinedApi", "UnspecifiedImmutableFlag")
-class GeoFenceHelper(val base: Application) : ContextWrapper(base) {
+class GeoFenceHelper(val base: Context) : ContextWrapper(base) {
 
     private val geofencingClient: GeofencingClient =
-        LocationServices.getGeofencingClient(base.applicationContext)
+        LocationServices.getGeofencingClient(this)
 
     private val geofenceIntent: PendingIntent by lazy {
         val runningSOrLater = android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S
-        val intent = Intent(base.applicationContext, GeofenceBroadcastReceiver::class.java)
+        val intent = Intent(this, GeofenceBroadcastReceiver::class.java)
         intent.action = ACTION_GEOFENCE_EVENT
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         val flags = if (runningSOrLater) {
@@ -37,7 +38,7 @@ class GeoFenceHelper(val base: Application) : ContextWrapper(base) {
             PendingIntent.FLAG_UPDATE_CURRENT
         }
         PendingIntent.getBroadcast(
-            base.applicationContext,
+            this,
             GEOFENCE_PENDING_INTENT_CODE,
             intent,
             flags
@@ -107,7 +108,7 @@ class GeoFenceHelper(val base: Application) : ContextWrapper(base) {
 
         val geofence = getGeoFence(
             placeId!!,
-            latLng!!,
+            latLng,
             radius,
             Geofence.GEOFENCE_TRANSITION_ENTER
         )
@@ -119,7 +120,6 @@ class GeoFenceHelper(val base: Application) : ContextWrapper(base) {
                 val errorMessage = errorString(it)
                 Timber.e(errorMessage)
             }
-
 
     }
 

@@ -186,7 +186,7 @@ class RemindersActivityTest :
         `when`(mockFirebaseUser.uid).thenReturn("uTZpVPPz8NT2LOvP4ufjs1L6r3P2")
         `when`(mockFirebaseUser.displayName).thenReturn("Bigad")
         val firebaseMock  = mock(FirebaseAuth::class.java)
-        ServiceLocator.auth = firebaseMock
+        AuhServiceLocator.auth = firebaseMock
 
         `when`(firebaseMock.currentUser).thenReturn(mockFirebaseUser)
 

@@ -125,7 +125,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
             binding.saveLocationTitleBtn.setOnClickListener {
                 binding.inputsContainer.visibility= View.GONE
                 it.let { activity?.hideKeyboard(it) }
-                _viewModel.confirmAddLocation(latLng,placeName)
+                _viewModel.confirmAddLocation(latLng)
             }
 
         }

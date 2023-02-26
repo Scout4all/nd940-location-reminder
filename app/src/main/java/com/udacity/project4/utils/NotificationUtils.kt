@@ -39,12 +39,12 @@ fun sendNotification(context: Context, reminderDataItem: ReminderDataItem) {
         .addNextIntent(intent)
     val notificationPendingIntent = stackBuilder
         .getPendingIntent(reminderDataItem.notification_id, PendingIntent.FLAG_UPDATE_CURRENT)
-
+val contentText = "you have arrived to ${reminderDataItem.location}"
 //    build the notification object with the data to be shown
     val notification = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
         .setSmallIcon(R.mipmap.ic_launcher)
         .setContentTitle(reminderDataItem.title)
-        .setContentText(reminderDataItem.location)
+        .setContentText(contentText)
         .setContentIntent(notificationPendingIntent)
         .setAutoCancel(true)
         .build()

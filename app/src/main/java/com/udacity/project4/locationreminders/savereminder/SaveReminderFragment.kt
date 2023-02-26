@@ -35,6 +35,7 @@ import com.udacity.project4.base.BaseFragment
 import com.udacity.project4.base.NavigationCommand
 import com.udacity.project4.databinding.FragmentSaveReminderBinding
 import com.udacity.project4.utils.setDisplayHomeAsUpEnabled
+import com.udacity.project4.utils.setTitle
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import timber.log.Timber
 
@@ -59,6 +60,10 @@ private var isLocationPermissionGranted = false
         binding.lifecycleOwner = this
         //check if there is passed args to make fragment behavior editing reminder
         if (args.dataItem != null) {
+
+            setTitle(args.dataItem!!.title.toString())
+
+
             _viewModel.dataItem.value = args.dataItem
         }
 
@@ -142,6 +147,7 @@ private var isLocationPermissionGranted = false
     }
 
     private fun checkDeviceLocationSettingsAndStartGeofence(resolve: Boolean = true)   {
+        var n = false
         val locationRequest = LocationRequest.create().apply {
                 this.priority = LocationRequest.PRIORITY_LOW_POWER
         }
@@ -169,10 +175,10 @@ private var isLocationPermissionGranted = false
                 }.show()
             }
         } .addOnCompleteListener {
-
-            _viewModel.validateAndSaveReminder(isLocationPermissionGranted,it.isSuccessful)
+n=it.isSuccessful
 
         }
+        _viewModel.validateAndSaveReminder(isLocationPermissionGranted,n)
 
 
     }

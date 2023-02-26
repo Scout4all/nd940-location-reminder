@@ -11,9 +11,7 @@ package com.udacity.project4.authentication
 import androidx.lifecycle.LiveData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.ktx.Firebase
-import com.udacity.project4.ServiceLocator
-import org.koin.java.KoinJavaComponent.inject
+import com.udacity.project4.AuhServiceLocator
 
 class FirebaseUserLiveData : LiveData<FirebaseUser?>() {
 
@@ -23,11 +21,11 @@ class FirebaseUserLiveData : LiveData<FirebaseUser?>() {
     }
 
     override fun onActive() {
-        ServiceLocator.auth.addAuthStateListener (authStateListener)
+        AuhServiceLocator.auth.addAuthStateListener (authStateListener)
     }
 
     override fun onInactive() {
-        ServiceLocator.auth.removeAuthStateListener (authStateListener)
+        AuhServiceLocator.auth.removeAuthStateListener (authStateListener)
 
     }
 }
