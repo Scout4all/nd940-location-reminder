@@ -54,4 +54,5 @@
     <string name="confirm_btn">Confirm</string>
     <string name="delete_reminder">delete reminder</string>
     <string name="location_name">Location name</string>
+    <string name="login_methods_message">Please choose one of login methods below to use app</string>
 </resources>

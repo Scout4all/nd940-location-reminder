@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2023.
+  ~ Developed by : Bigad Aboubakr
+  ~ Developer website : http://bigad.me
+  ~ Developer github : https://github.com/Scout4all
+  ~ Developer Email : bigad@bigad.me
+  -->
+
+<MotionScene
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:motion="http://schemas.android.com/apk/res-auto">
+
+    <Transition
+        motion:constraintSetEnd="@+id/end"
+        motion:constraintSetStart="@id/start"
+        motion:autoTransition="animateToEnd"
+        motion:duration="300" />
+
+    <ConstraintSet android:id="@+id/start">
+        <Constraint
+            motion:layout_constraintEnd_toEndOf="parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            motion:layout_constraintBottom_toTopOf="@+id/google_login_button"
+            motion:layout_constraintTop_toBottomOf="@+id/welcome_message"
+            motion:layout_constraintVertical_chainStyle="packed"
+            motion:layout_constraintHorizontal_bias="0.5"
+            motion:layout_constraintStart_toStartOf="parent"
+            android:id="@+id/email_login_button"
+            motion:layout_constraintVertical_bias="1.0" />
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/end">
+        <Constraint
+            motion:layout_constraintEnd_toEndOf="parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            motion:layout_constraintBottom_toTopOf="@+id/google_login_button"
+            motion:layout_constraintTop_toBottomOf="@+id/welcome_message"
+            motion:layout_constraintVertical_chainStyle="packed"
+            motion:layout_constraintHorizontal_bias="0.5"
+            motion:layout_constraintStart_toStartOf="parent"
+            android:id="@+id/email_login_button"
+            motion:layout_constraintVertical_bias="0.85" />
+    </ConstraintSet>
+</MotionScene>

@@ -11,7 +11,7 @@ package com.udacity.project4.authentication
 import androidx.lifecycle.LiveData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.udacity.project4.AuhServiceLocator
+import com.udacity.project4.AuthServiceLocator
 
 class FirebaseUserLiveData : LiveData<FirebaseUser?>() {
 
@@ -21,14 +21,14 @@ class FirebaseUserLiveData : LiveData<FirebaseUser?>() {
     }
 
     override fun onActive() {
-        AuhServiceLocator.auth.addAuthStateListener (authStateListener)
+        AuthServiceLocator.auth.addAuthStateListener (authStateListener)
     }
 
     override fun onInactive() {
-        AuhServiceLocator.auth.removeAuthStateListener (authStateListener)
+        AuthServiceLocator.auth.removeAuthStateListener (authStateListener)
 
     }
 }
-enum class AuthState(){
+enum class AuthState {
     AUTHENTICATED,UNAUTHENTICATED
 }

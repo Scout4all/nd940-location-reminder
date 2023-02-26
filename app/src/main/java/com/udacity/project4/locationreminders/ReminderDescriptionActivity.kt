@@ -14,14 +14,19 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.udacity.project4.AuthObserver
+import com.udacity.project4.AuthServiceLocator
 import com.udacity.project4.R
+import com.udacity.project4.authentication.AuthState
 import com.udacity.project4.authentication.AuthenticationActivity
 import com.udacity.project4.databinding.ActivityReminderDescriptionBinding
 import com.udacity.project4.domain.ReminderDataItem
+import com.udacity.project4.utils.INTENT_TO_DESCRIPTION_ACTIVITY
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
@@ -47,16 +52,13 @@ class ReminderDescriptionActivity : AppCompatActivity() {
     private var reminderItem: ReminderDataItem? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        checkLogin()
         binding = DataBindingUtil.setContentView(
             this,
             R.layout.activity_reminder_description
         )
-        if (Firebase.auth.currentUser == null) {
-            val intent = Intent(this, AuthenticationActivity::class.java)
-            startActivity(intent)
-        }
-//        TODO: Add the implementation of the reminder details
-        val intent = getIntent()
+
+         val intent = getIntent()
 
         Timber.e(intent.getSerializableExtra(EXTRA_ReminderDataItem).toString())
         if (intent.getSerializableExtra(EXTRA_ReminderDataItem) != null) {
@@ -65,6 +67,16 @@ class ReminderDescriptionActivity : AppCompatActivity() {
         }
         binding.reminderDataItem = reminderItem
 
+    }
+    private fun checkLogin( ){
+        AuthObserver.authState.observe(this) {
+            if (it == AuthState.UNAUTHENTICATED) {
+                val intent = Intent(this, AuthenticationActivity::class.java)
+                intent.putExtra(INTENT_TO_DESCRIPTION_ACTIVITY,true)
+                startActivity(intent)
+
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

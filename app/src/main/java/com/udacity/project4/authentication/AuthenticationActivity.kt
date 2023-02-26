@@ -10,17 +10,24 @@ package com.udacity.project4.authentication
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.map
+import com.firebase.ui.auth.AuthMethodPickerLayout
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.ktx.initialize
+import com.udacity.project4.AuthObserver
+import com.udacity.project4.AuthServiceLocator
 import com.udacity.project4.R
 import com.udacity.project4.databinding.ActivityAuthenticationBinding
+import com.udacity.project4.locationreminders.ReminderDescriptionActivity
 import com.udacity.project4.locationreminders.RemindersActivity
+import com.udacity.project4.utils.INTENT_TO_DESCRIPTION_ACTIVITY
 import timber.log.Timber
 
 /**
@@ -37,6 +44,8 @@ class AuthenticationActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_authentication)
         binding.lifecycleOwner = this
 
+       val toDescription= getIntent().getBooleanExtra(INTENT_TO_DESCRIPTION_ACTIVITY,false)
+        checkLogin(toDescription)
         binding.loginButton.setOnClickListener {
             signInFlow()
         }
@@ -55,51 +64,68 @@ class AuthenticationActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         //check if user logged in  when activity send results then move to to Reminders activity when login
-        checkLogin()
+
     }
 
     override fun onStart() {
         super.onStart()
         //check if user logged in then move to to Reminders activity
 
-        checkLogin()
+
     }
 
-    private fun checkLogin() {
-        //FirebaseUserLiveData didn't work here :\ so i have done next :(
-        Firebase.initialize(this@AuthenticationActivity)
-        val auth = FirebaseAuth.getInstance()
-        if (auth.currentUser != null) {
-            val intent = Intent(this, RemindersActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            startActivity(intent)
+    private fun checkLogin(toDescriptionActivity: Boolean) {
+        AuthObserver.authState.observe(this) {
+            if (it == AuthState.AUTHENTICATED) {
+                if(toDescriptionActivity){
+                    onBackPressed()
+                }else{
+                    val intent = Intent(this, RemindersActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                }
+            }
         }
     }
 
     private fun signInFlow() {
+
         val providers = arrayListOf(
             AuthUI.IdpConfig.GoogleBuilder().build(),
             AuthUI.IdpConfig.EmailBuilder().build(),
         )
 
-        val signInIntent = AuthUI.getInstance()
+
+        val customLayout = AuthMethodPickerLayout.Builder(R.layout.authui_screen)
+            .setEmailButtonId(R.id.email_login_button)
+            .setGoogleButtonId(R.id.google_login_button)
+            .build()
+
+        val signInIntent: Intent = AuthUI.getInstance()
             .createSignInIntentBuilder()
             .setIsSmartLockEnabled(false)
+            .setAuthMethodPickerLayout(customLayout)
             .setAvailableProviders(providers)
-            .setLogo(R.mipmap.ic_launcher_round)
-            .setTheme(R.style.AppTheme)
-            .setTosAndPrivacyPolicyUrls(
-                "https://bigad.me",
-                "https://bigad.me"
-            )
+
             .build()
+
 
         signInLauncher.launch(signInIntent)
 
     }
 
 
-
+/*
+     val customLayout = AuthMethodPickerLayout.Builder(R.layout.your_custom_layout_xml)
+//            .setGoogleButtonId(R.id.bar)
+//            .setEmailButtonId(R.id.foo) // ...
+//            .setTosAndPrivacyPolicyId(R.id.baz)
+//            .build()
+//
+//        val signInIntent: Intent = AuthUI.getInstance(this).createSignInIntentBuilder() // ...
+//            .setAuthMethodPickerLayout(customLayout)
+//            .build()
+ */
 
     private fun onSignInResult(result: FirebaseAuthUIAuthenticationResult) {
         val response = result.idpResponse
@@ -111,6 +137,12 @@ class AuthenticationActivity : AppCompatActivity() {
 
             Timber.i("Sign in unsuccessful ${response?.error?.errorCode}")
 
+        }
+    }
+    val authState = FirebaseUserLiveData().map {
+        when(it){
+            null -> AuthState.UNAUTHENTICATED
+            else -> AuthState.AUTHENTICATED
         }
     }
 

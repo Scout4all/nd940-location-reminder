@@ -12,7 +12,7 @@ import androidx.annotation.VisibleForTesting
 import com.udacity.project4.domain.ReminderDataItem
 import com.udacity.project4.locationreminders.data.dto.ReminderDTO
 
-@VisibleForTesting(otherwise = VisibleForTesting.NONE)
+
 object FakeData {
     //
     val reminderDataItem1 = ReminderDataItem(

@@ -22,7 +22,7 @@ interface RemindersDao {
     /**
      * @return all reminders.
      */
-    @Query("SELECT * FROM reminders order by location asc")
+    @Query("SELECT * FROM reminders order by notification_id desc")
     suspend fun getReminders(): List<ReminderDTO>
 
     /**

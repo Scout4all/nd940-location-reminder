@@ -11,7 +11,7 @@ package com.udacity.project4
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
-object AuhServiceLocator {
+object AuthServiceLocator {
     var auth = Firebase.auth
 
 }
