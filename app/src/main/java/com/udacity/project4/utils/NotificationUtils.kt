@@ -42,7 +42,7 @@ fun sendNotification(context: Context, reminderDataItem: ReminderDataItem) {
 val contentText = "you have arrived to ${reminderDataItem.location}"
 //    build the notification object with the data to be shown
     val notification = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
-        .setSmallIcon(R.mipmap.ic_launcher)
+        .setSmallIcon(R.drawable.ic_launcher_foreground)
         .setContentTitle(reminderDataItem.title)
         .setContentText(contentText)
         .setContentIntent(notificationPendingIntent)

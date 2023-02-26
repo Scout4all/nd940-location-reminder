@@ -67,7 +67,6 @@ import org.mockito.Mockito.`when`
 class RemindersActivityTest :
     KoinTest {
     // Extended Koin Test - embed autoclose @after method to close Koin after every test
-    //ToDo fix tests and add toast test
 
     private val device = UiDevice.getInstance(getInstrumentation())
 
@@ -99,8 +98,8 @@ class RemindersActivityTest :
                 )
             }
 
-             viewModel {
-                 SaveReminderViewModel(
+            viewModel {
+                SaveReminderViewModel(
                     get(),
                     get() as ReminderDataSource,
                     get()
@@ -142,8 +141,10 @@ class RemindersActivityTest :
             }
         }
     }
-@After
-fun closeKoin() = stopKoin()
+
+    @After
+    fun closeKoin() = stopKoin()
+
     //clean database after finish test
     @After
     fun resetDatabase() = runBlocking {
@@ -157,12 +158,13 @@ fun closeKoin() = stopKoin()
         register(EspressoIdlingResource.countingIdlingResource)
         register(dataBindingIdlingResource)
     }
+
     @Before
-    fun initLogin()  {
+    fun initLogin() {
         val mockFirebaseUser: FirebaseUser = mock(FirebaseUser::class.java)
         `when`(mockFirebaseUser.uid).thenReturn("uTZpVPPz8NT2LOvP4ufjs1L6r3P2")
         `when`(mockFirebaseUser.displayName).thenReturn("Tester")
-        val firebaseMock  = mock(FirebaseAuth::class.java)
+        val firebaseMock = mock(FirebaseAuth::class.java)
         AuthServiceLocator.auth = firebaseMock
         `when`(firebaseMock.currentUser).thenReturn(mockFirebaseUser)
     }
@@ -190,13 +192,11 @@ fun closeKoin() = stopKoin()
 
 
     @Test
-    fun addReminderTest_notSelectedLocationErrors_ResultShowToastSnakeBar() {
+    fun addReminderTest_notSelectedLocationErrors_ResultShowSnakeBar() {
         val reminderData = FakeData.remindersDTOList.get(0)
         val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
         dataBindingIdlingResource.monitorActivity(activityScenario)
         onView(withId(R.id.addReminderFAB)).perform(click())
-
-
         onView(withId(R.id.reminderTitle)).perform(typeText(reminderData.title))
         Espresso.closeSoftKeyboard()
         //check empty location when save button
@@ -206,10 +206,6 @@ fun closeKoin() = stopKoin()
 
         activityScenario.close()
     }
-
-
-
-
 
 
     @Test
@@ -226,6 +222,10 @@ fun closeKoin() = stopKoin()
 
         addReminderLocationAndSave(reminderData)
 
+        onView(withText(R.string.reminder_saved)).inRoot(ToastMatcher())
+            .check(matches(isDisplayed()))
+
+        onView(withText(reminderData.title)).check(matches(isDisplayed()))
 
         activityScenario.close()
     }
@@ -250,9 +250,6 @@ fun closeKoin() = stopKoin()
         onView(withText("Confirm")).perform(click())
         onView(withId(R.id.saveReminder)).perform(click())
 
-         onView(withText(R.string.reminder_saved)).inRoot(ToastMatcher()).check(matches(isDisplayed()))
-
-        onView(withText(reminderData.title)).check(matches(isDisplayed()))
 
     }
 
@@ -290,64 +287,83 @@ fun closeKoin() = stopKoin()
         onView(withId(R.id.noDataTextView)).check(matches(isDisplayed()))
         activityScenario.close()
     }
-//
-//    @Test
-//    fun openAppWhileNoLocationService_enableLocationFromAppAndSaveReminder() {
-//        locationHelper()
-//        val reminderData = FakeData.remindersDTOList.get(0)
-//
-//        val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
-//        dataBindingIdlingResource.monitorActivity(activityScenario)
-//        val allowGpsBtn = device.findObject(
-//            UiSelector()
-//                .className("android.widget.Button").packageName("com.google.android.gms")
-//                .resourceId("android:id/button1")
-//                .clickable(true).checkable(false)
-//        )
-//        device.pressDelete() // just in case to turn ON blur screen (not a wake up) for some devices like HTC and some other
-//
-//        if (allowGpsBtn.exists() && allowGpsBtn.isEnabled) {
-//            do {
-//                allowGpsBtn.click()
-//            } while (allowGpsBtn.exists())
-//        }
-//
-//        dataBindingIdlingResource.monitorActivity(activityScenario)
-//        onView(withId(R.id.addReminderFAB)).perform(click())
-//
-//
-//        onView(withId(R.id.reminderTitle)).perform(typeText(reminderData.title))
-//        onView(withId(R.id.reminderDescription)).perform(typeText(reminderData.description))
-//        Espresso.closeSoftKeyboard()
-//
-//        addReminderLocationAndSave(reminderData)
-//
-//
-//
-//        activityScenario.close()
-//        resetLocation()
-//    }
+
+    //
+    @Test
+    fun openAppWhileNoLocationService_enableLocationFromAppAndSaveReminder() {
+        if (locationHelper()) {
+            val reminderData = FakeData.remindersDTOList.get(0)
+
+            val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
+            dataBindingIdlingResource.monitorActivity(activityScenario)
 
 
-    private fun locationHelper() {
-        if (isLocationEnabled()) {
-            device.openQuickSettings()
-            val notification = device.findObject(UiSelector().textContains("Location"))
-            notification.click()
-            device.pressHome()
+            dataBindingIdlingResource.monitorActivity(activityScenario)
+            onView(withId(R.id.addReminderFAB)).perform(click())
+
+
+            onView(withId(R.id.reminderTitle)).perform(typeText(reminderData.title))
+            onView(withId(R.id.reminderDescription)).perform(typeText(reminderData.description))
+            Espresso.closeSoftKeyboard()
+
+            addReminderLocationAndSave(reminderData)
+            device.waitForIdle(5000)
+
+            val allowGpsBtn = device.findObject(
+                UiSelector()
+                    .className("android.widget.Button").packageName("com.google.android.gms")
+                    .resourceId("android:id/button1")
+                    .clickable(true).checkable(false)
+            )
+            device.pressDelete() // just in case to turn ON blur screen (not a wake up) for some devices like HTC and some other
+
+            if (allowGpsBtn.exists() && allowGpsBtn.isEnabled) {
+                do {
+                    allowGpsBtn.click()
+                } while (allowGpsBtn.exists())
+            }
+            onView(withText(R.string.reminder_saved)).inRoot(ToastMatcher())
+                .check(matches(isDisplayed()))
+
+            onView(withText(reminderData.title)).check(matches(isDisplayed()))
+
+            activityScenario.close()
+
+            resetLocation()
         }
     }
 
 
-    private fun resetLocation() {
-        if (!isLocationEnabled()) {
-
+    private fun locationHelper(): Boolean {
+        var isDisabled = false
+        if (isLocationEnabled()) {
             device.openQuickSettings()
             val notification = device.findObject(UiSelector().textContains("Location"))
+            if (notification.exists()) {
+                notification.click()
+                isDisabled = true
+            }
+            device.pressHome()
+        } else {
+            isDisabled = true
+        }
+        return isDisabled
+    }
 
-            notification.click()
+
+    private fun resetLocation(): Boolean {
+        var isDisabled = false
+        if (!isLocationEnabled()) {
+            device.openQuickSettings()
+            val notification = device.findObject(UiSelector().textContains("Location"))
+            if (notification.exists()) {
+                notification.click()
+                isDisabled = true
+            }
+
             device.pressHome()
         }
+        return isDisabled
     }
 
     private fun isLocationEnabled(): Boolean {
