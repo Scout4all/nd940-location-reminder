@@ -11,10 +11,8 @@ package com.udacity.project4.authentication
 import androidx.lifecycle.LiveData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.udacity.project4.AuthServiceLocator
 
 class FirebaseUserLiveData : LiveData<FirebaseUser?>() {
-
 
     private val authStateListener = FirebaseAuth.AuthStateListener { firebaseAuth ->
         value = firebaseAuth.currentUser

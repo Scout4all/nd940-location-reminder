@@ -20,6 +20,7 @@ import com.udacity.project4.locationreminders.geofence.GeoFenceHelper
 import com.udacity.project4.domain.ReminderDataItem
 import com.udacity.project4.domain.asReminderDataObject
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class SaveReminderViewModel(
     val app: Application,
@@ -49,13 +50,16 @@ class SaveReminderViewModel(
     fun validateAndSaveReminder(addGeofence: Boolean, locationEnabled: Boolean) {
         dataItem.value?.let { reminderData->
             if (validateEnteredData(reminderData)) {
+                Timber.e("$addGeofence $locationEnabled")
+        if(addGeofence && locationEnabled) {
 
-                    geoFenceHelper.addGeoFence(
-                        reminderData.latitude!!.toDouble(),
-                        reminderData.longitude!!.toDouble(),
-                        placeId = reminderData.id.toString()
-                    )
-                    showToast.value = "Geofence Added"
+            geoFenceHelper.addGeoFence(
+                reminderData.latitude!!.toDouble(),
+                reminderData.longitude!!.toDouble(),
+                placeId = reminderData.id.toString()
+            )
+
+        }
 
                 saveReminder(reminderData)
             }
@@ -79,7 +83,7 @@ class SaveReminderViewModel(
     /**
      * Validate the entered data and show error to the user if there's any invalid data
      */
- private   fun validateEnteredData(reminderData: ReminderDataItem): Boolean {
+    fun validateEnteredData(reminderData: ReminderDataItem): Boolean {
         if (reminderData.title.isNullOrEmpty()) {
             showSnackBarInt.value = R.string.err_enter_title
 

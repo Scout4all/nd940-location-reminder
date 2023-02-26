@@ -8,25 +8,21 @@
 
 package com.udacity.project4.locationreminders
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.map
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
-import com.udacity.project4.AuthObserver
-import com.udacity.project4.AuthServiceLocator
+import com.udacity.project4.authentication.AuthObserver
 import com.udacity.project4.R
+import com.udacity.project4.authentication.AuthServiceLocator
 import com.udacity.project4.authentication.AuthState
 import com.udacity.project4.authentication.AuthenticationActivity
-import com.udacity.project4.authentication.FirebaseUserLiveData
 import com.udacity.project4.databinding.ActivityRemindersBinding
-import timber.log.Timber
 
 
 /**

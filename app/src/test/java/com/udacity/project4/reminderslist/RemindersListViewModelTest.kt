@@ -15,7 +15,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.udacity.project4.data.FakeData
-import com.udacity.project4.data.FakeDataSource
+import com.udacity.project4.data.local.RemindersFakeRepository
 import com.udacity.project4.locationreminders.geofence.GeoFenceHelper
 import com.udacity.project4.locationreminders.reminderslist.RemindersListViewModel
 import com.udacity.project4.utils.MainCoroutineRule
@@ -42,7 +42,7 @@ class RemindersListViewModelTest {
     private lateinit var appContext: Application
     private lateinit var geoFenceHelper: GeoFenceHelper
     private lateinit var viewModel: RemindersListViewModel
-    private lateinit var fakeDataSource: FakeDataSource
+    private lateinit var remindersFakeRepository: RemindersFakeRepository
 
     @get:Rule
     val instantExecutorRule = InstantTaskExecutorRule()
@@ -55,15 +55,15 @@ class RemindersListViewModelTest {
         stopKoin()
         appContext = ApplicationProvider.getApplicationContext()
         geoFenceHelper = GeoFenceHelper(appContext)
-        fakeDataSource = FakeDataSource()
-        viewModel = RemindersListViewModel(appContext, fakeDataSource, geoFenceHelper)
+        remindersFakeRepository = RemindersFakeRepository()
+        viewModel = RemindersListViewModel(appContext, remindersFakeRepository, geoFenceHelper)
 
         insertReminders()
     }
 
     private fun insertReminders() = mainCoroutineRule.runTest {
         FakeData.remindersDTOList.forEachIndexed { index, reminderDataItem ->
-            fakeDataSource.saveReminder(reminderDataItem)
+            remindersFakeRepository.saveReminder(reminderDataItem)
         }
     }
 
@@ -86,9 +86,9 @@ class RemindersListViewModelTest {
             //check show loading view is gone
             showLoading = viewModel.showLoading.getOrAwaitValue()
             assertThat(showLoading, `is`(false))
-//check if result is not empty
+         //check if result is not empty
             assertThat(result.isNotEmpty(), `is`(true))
-            assertThat(result.size, `is`(fakeDataSource.reminders?.size))
+            assertThat(result.size, `is`(remindersFakeRepository.remindersDao.size))
         }
 
     @Test
@@ -136,7 +136,7 @@ class RemindersListViewModelTest {
     @Test
     fun loadReminders_DataSourceError_SnakeBarIsShown() = mainCoroutineRule.runBlockingTest {
         //Given
-        fakeDataSource.setForceError()
+        remindersFakeRepository.setForceError()
 
         //when
         viewModel.loadReminders()
@@ -144,7 +144,7 @@ class RemindersListViewModelTest {
         //Then
         val result = viewModel.showSnackBar.getOrAwaitValue()
 
-        assertThat(result, `is`("Reminders not Found"))
+        assertThat(result, `is`("Exception"))
 
     }
 

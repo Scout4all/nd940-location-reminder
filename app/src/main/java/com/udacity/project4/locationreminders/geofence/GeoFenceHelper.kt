@@ -14,6 +14,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
+import android.os.Build
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.model.LatLng
@@ -21,22 +22,26 @@ import com.udacity.project4.utils.ACTION_GEOFENCE_EVENT
 import com.udacity.project4.utils.GEOFENCE_PENDING_INTENT_CODE
 import timber.log.Timber
 
-@SuppressLint("InlinedApi", "UnspecifiedImmutableFlag")
-class GeoFenceHelper(val base: Context) : ContextWrapper(base) {
+
+class GeoFenceHelper(val base: Application) : ContextWrapper(base) {
 
     private val geofencingClient: GeofencingClient =
         LocationServices.getGeofencingClient(this)
 
     private val geofenceIntent: PendingIntent by lazy {
-        val runningSOrLater = android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S
+
         val intent = Intent(this, GeofenceBroadcastReceiver::class.java)
         intent.action = ACTION_GEOFENCE_EVENT
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        val flags = if (runningSOrLater) {
-            PendingIntent.FLAG_IMMUTABLE
+
+        val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+           PendingIntent.FLAG_MUTABLE
         } else {
             PendingIntent.FLAG_UPDATE_CURRENT
         }
+
+
+
+
         PendingIntent.getBroadcast(
             this,
             GEOFENCE_PENDING_INTENT_CODE,

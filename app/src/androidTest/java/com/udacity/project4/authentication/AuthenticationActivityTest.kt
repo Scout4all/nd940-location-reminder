@@ -6,12 +6,11 @@
  * Developer Email : bigad@bigad.me
  */
 
-package com.udacity.project4
+package com.udacity.project4.authentication
 
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
+import org.junit.Assert.*
+import org.koin.test.KoinTest
 
-object AuthServiceLocator {
-    var auth = Firebase.auth
+class AuthenticationActivityTest : KoinTest{
 
 }

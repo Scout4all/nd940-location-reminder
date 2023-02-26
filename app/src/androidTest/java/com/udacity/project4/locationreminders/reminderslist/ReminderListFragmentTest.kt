@@ -13,6 +13,7 @@ import android.os.Bundle
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
+
 import androidx.recyclerview.widget.RecyclerView
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
@@ -28,6 +29,7 @@ import com.udacity.project4.locationreminders.data.ReminderDataSource
 import com.udacity.project4.locationreminders.data.local.RemindersDatabase
 import com.udacity.project4.locationreminders.data.local.RemindersLocalRepository
 import com.udacity.project4.locationreminders.geofence.GeoFenceHelper
+
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -120,7 +122,7 @@ class ReminderListFragmentTest : KoinTest {
         onView(withId(R.id.addReminderFAB)).perform(click())
 
         verify(navController).navigate(
-            ReminderListFragmentDirections.toSaveReminder(null)
+            ReminderListFragmentDirections.toSaveReminder( )
         )
     }
 
@@ -138,7 +140,7 @@ class ReminderListFragmentTest : KoinTest {
         )
 
         verify(navController).navigate(
-            ReminderListFragmentDirections.toSaveReminder(FakeData.reminderDataItemsList.get(0))
+            ReminderListFragmentDirections.toSaveReminder().setDataItem(FakeData.reminderDataItemsList.get(0))
         )
     }
 

@@ -29,23 +29,26 @@ import timber.log.Timber
 class GeofenceBroadcastReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
 
-        Timber.e("Bigad ${intent.data.toString()}")
+        Timber.e("GeoFence ${intent.extras.toString()}")
         if (intent.action == ACTION_GEOFENCE_EVENT) {
-            val geofencingEvent: GeofencingEvent = GeofencingEvent.fromIntent(intent)!!
+            val geofencingEvent: GeofencingEvent? = GeofencingEvent.fromIntent(intent)
+
+            if (geofencingEvent != null) {
+                if (geofencingEvent.hasError()) {
+                    Timber.e(geofencingEvent.errorCode.toString())
+                    return
+                }
 
 
-            if (geofencingEvent.hasError()) {
-                Timber.e(geofencingEvent.errorCode.toString())
-                return
-            }
             Timber.e(geofencingEvent.triggeringGeofences.toString())
 
             if (geofencingEvent.geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER) {
 
                 GeofenceTransitionsJobIntentService.enqueueWork(context, intent)
             }
-        }
+            }
 
+        }
 
     }
 }

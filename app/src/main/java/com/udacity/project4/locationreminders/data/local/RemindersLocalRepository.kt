@@ -49,7 +49,6 @@ class RemindersLocalRepository(
      */
     override suspend fun saveReminder(reminder: ReminderDTO) =
         wrapEspressoIdlingResource {
-
             withContext(ioDispatcher) {
                 remindersDao.saveReminder(reminder)
             }

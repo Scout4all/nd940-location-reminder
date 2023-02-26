@@ -55,4 +55,5 @@
     <string name="delete_reminder">delete reminder</string>
     <string name="location_name">Location name</string>
     <string name="login_methods_message">Please choose one of login methods below to use app</string>
+    <string name="geofence_added">Geofence Added</string>
 </resources>

@@ -41,11 +41,11 @@ import timber.log.Timber
 
 class SaveReminderFragment : BaseFragment() {
     //Get the view model this time as a single to be shared with the another fragment
-    override val _viewModel: SaveReminderViewModel by activityViewModel()
+    override val _viewModel: SaveReminderViewModel by activityViewModel<SaveReminderViewModel>()
     private lateinit var binding: FragmentSaveReminderBinding
 
     private val args: SaveReminderFragmentArgs by navArgs()
-private var isLocationPermissionGranted = false
+    private var isLocationPermissionGranted = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -111,7 +111,7 @@ private var isLocationPermissionGranted = false
             (permissions.getOrDefault(Manifest.permission.ACCESS_BACKGROUND_LOCATION, false)
                     && permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false))
             -> {
-                isLocationPermissionGranted
+                isLocationPermissionGranted = true
             }
             else -> {
                 Snackbar.make(
@@ -132,24 +132,29 @@ private var isLocationPermissionGranted = false
     }
 
 
+    var locationServiceEnabledResult =
+        registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+            var locationEnabled = false
+            if (result.resultCode == Activity.RESULT_OK) {
+                checkDeviceLocationSettingsAndStartGeofence(false)
+                locationEnabled = true
+            } else {
+                Snackbar.make(
+                    binding.root,
+                    R.string.location_required_error, Snackbar.LENGTH_LONG
+                ).setAction(android.R.string.ok) {
+                    checkDeviceLocationSettingsAndStartGeofence()
+                }.show()
+            }
 
-    var locationServiceEnabledResult = registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK ) {
-            checkDeviceLocationSettingsAndStartGeofence(false)
-        }else{
-            Snackbar.make(
-                binding.root,
-                R.string.location_required_error, Snackbar.LENGTH_LONG
-            ).setAction(android.R.string.ok) {
-                checkDeviceLocationSettingsAndStartGeofence()
-            }.show()
+            _viewModel.validateAndSaveReminder(isLocationPermissionGranted, locationEnabled)
+
         }
-    }
 
-    private fun checkDeviceLocationSettingsAndStartGeofence(resolve: Boolean = true)   {
+    private fun checkDeviceLocationSettingsAndStartGeofence(resolve: Boolean = true) {
         var n = false
         val locationRequest = LocationRequest.create().apply {
-                this.priority = LocationRequest.PRIORITY_LOW_POWER
+            this.priority = LocationRequest.PRIORITY_LOW_POWER
         }
         val builder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest)
         val settingsClient = LocationServices.getSettingsClient(requireActivity())
@@ -174,11 +179,11 @@ private var isLocationPermissionGranted = false
                     checkDeviceLocationSettingsAndStartGeofence()
                 }.show()
             }
-        } .addOnCompleteListener {
-n=it.isSuccessful
-
+        }.addOnCompleteListener {
+            if (it.isSuccessful) {
+                _viewModel.validateAndSaveReminder(isLocationPermissionGranted, it.isSuccessful)
+            }
         }
-        _viewModel.validateAndSaveReminder(isLocationPermissionGranted,n)
 
 
     }

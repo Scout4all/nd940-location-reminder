@@ -6,7 +6,7 @@
  * Developer Email : bigad@bigad.me
  */
 
-package com.udacity.project4
+package com.udacity.project4.authentication
 
 import androidx.lifecycle.map
 import com.udacity.project4.authentication.AuthState

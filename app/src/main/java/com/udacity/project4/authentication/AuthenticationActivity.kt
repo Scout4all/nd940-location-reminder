@@ -10,7 +10,6 @@ package com.udacity.project4.authentication
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.map
@@ -19,13 +18,8 @@ import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.ktx.initialize
-import com.udacity.project4.AuthObserver
-import com.udacity.project4.AuthServiceLocator
 import com.udacity.project4.R
 import com.udacity.project4.databinding.ActivityAuthenticationBinding
-import com.udacity.project4.locationreminders.ReminderDescriptionActivity
 import com.udacity.project4.locationreminders.RemindersActivity
 import com.udacity.project4.utils.INTENT_TO_DESCRIPTION_ACTIVITY
 import timber.log.Timber
@@ -58,20 +52,6 @@ class AuthenticationActivity : AppCompatActivity() {
         FirebaseAuthUIActivityResultContract()
     ) { res ->
         this.onSignInResult(res)
-    }
-
-
-    override fun onResume() {
-        super.onResume()
-        //check if user logged in  when activity send results then move to to Reminders activity when login
-
-    }
-
-    override fun onStart() {
-        super.onStart()
-        //check if user logged in then move to to Reminders activity
-
-
     }
 
     private fun checkLogin(toDescriptionActivity: Boolean) {

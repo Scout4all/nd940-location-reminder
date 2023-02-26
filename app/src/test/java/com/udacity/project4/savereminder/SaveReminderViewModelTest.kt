@@ -17,7 +17,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.udacity.project4.R
 import com.udacity.project4.data.FakeData
-import com.udacity.project4.data.FakeDataSource
+import com.udacity.project4.data.local.RemindersFakeRepository
 import com.udacity.project4.locationreminders.geofence.GeoFenceHelper
 import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
 import com.udacity.project4.utils.MainCoroutineRule
@@ -38,7 +38,7 @@ class SaveReminderViewModelTest {
     private lateinit var appContext: Application
     private lateinit var geoFenceHelper: GeoFenceHelper
     private lateinit var viewModel: SaveReminderViewModel
-    private lateinit var fakeDataSource: FakeDataSource
+    private lateinit var remindersFakeRepository: RemindersFakeRepository
 
     @get:Rule
     val instantExecutorRule = InstantTaskExecutorRule()
@@ -53,8 +53,8 @@ class SaveReminderViewModelTest {
         appContext = ApplicationProvider.getApplicationContext()
         geoFenceHelper = GeoFenceHelper(appContext)
 
-        fakeDataSource = FakeDataSource()
-        viewModel = SaveReminderViewModel(appContext, fakeDataSource, geoFenceHelper)
+        remindersFakeRepository = RemindersFakeRepository()
+        viewModel = SaveReminderViewModel(appContext, remindersFakeRepository, geoFenceHelper)
     }
 
     @Test
