@@ -50,14 +50,12 @@ class GeofenceTransitionsJobIntentService : JobIntentService(), CoroutineScope {
         }
         Timber.e(geofencingEvent.triggeringGeofences.toString())
         if (geofencingEvent.geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER) {
-      val triggeredGeofence = geofencingEvent.triggeringGeofences
-            if(!triggeredGeofence.isNullOrEmpty()) {
+            val triggeredGeofence = geofencingEvent.triggeringGeofences
+            if (!triggeredGeofence.isNullOrEmpty()) {
                 for (geofence in triggeredGeofence) {
                     sendNotification(geofence.requestId)
                 }
             }
-
-
         }
 
 
@@ -65,7 +63,7 @@ class GeofenceTransitionsJobIntentService : JobIntentService(), CoroutineScope {
 
 
     private fun sendNotification(requestId: String) {
-             //Get the local repository instance
+        //Get the local repository instance
         val remindersLocalRepository: ReminderDataSource by inject()
 //        Interaction to the repository has to be through a coroutine scope
         CoroutineScope(coroutineContext).launch(SupervisorJob()) {
