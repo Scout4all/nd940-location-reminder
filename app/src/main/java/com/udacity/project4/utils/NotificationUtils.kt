@@ -33,12 +33,18 @@ fun sendNotification(context: Context, reminderDataItem: ReminderDataItem) {
 
     val intent = ReminderDescriptionActivity.newIntent(context.applicationContext, reminderDataItem)
 
+    val pendingIntentFlag = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S){
+        PendingIntent.FLAG_IMMUTABLE
+    }else{
+        PendingIntent.FLAG_UPDATE_CURRENT
+    }
+
     //create a pending intent that opens ReminderDescriptionActivity when the user clicks on the notification
     val stackBuilder = TaskStackBuilder.create(context)
         .addParentStack(ReminderDescriptionActivity::class.java)
         .addNextIntent(intent)
     val notificationPendingIntent = stackBuilder
-        .getPendingIntent(reminderDataItem.notification_id, PendingIntent.FLAG_UPDATE_CURRENT)
+        .getPendingIntent(reminderDataItem.notification_id, pendingIntentFlag)
     val contentText = "you have arrived to ${reminderDataItem.location}"
 //    build the notification object with the data to be shown
     val notification = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
@@ -52,4 +58,3 @@ fun sendNotification(context: Context, reminderDataItem: ReminderDataItem) {
     notificationManager.notify(reminderDataItem.notification_id, notification)
 }
 
-//private fun getUniqueId() = ((System.currentTimeMillis() % 10000).toInt())
