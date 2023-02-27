@@ -8,7 +8,6 @@
 
 package com.udacity.project4.data
 
-import androidx.annotation.VisibleForTesting
 import com.udacity.project4.domain.ReminderDataItem
 import com.udacity.project4.locationreminders.data.dto.ReminderDTO
 import com.udacity.project4.locationreminders.data.dto.asReminderDataItemsList
@@ -47,15 +46,13 @@ object FakeData {
     )
 
 
-
-
-  val emptyTitle=  ReminderDataItem(
-    null,
-    "daily friend meeting at evening", "Caribou Coffee",
-    25.104943, 55.168110,
-    "ChIJAAAAAAAAAAARfyitG2mPJTc"
+    val emptyTitle = ReminderDataItem(
+        null,
+        "daily friend meeting at evening", "Caribou Coffee",
+        25.104943, 55.168110,
+        "ChIJAAAAAAAAAAARfyitG2mPJTc"
     )
-val reminderDataItemsList = remindersDTOList.asReminderDataItemsList()
+    val reminderDataItemsList = remindersDTOList.asReminderDataItemsList()
 
 
 }

@@ -18,6 +18,7 @@ import com.google.common.truth.Truth.assertThat
 import com.udacity.project4.R
 import com.udacity.project4.data.FakeData
 import com.udacity.project4.data.local.RemindersFakeRepository
+import com.udacity.project4.locationreminders.data.dto.asReminderDataItem
 import com.udacity.project4.locationreminders.geofence.GeoFenceHelper
 import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
 import com.udacity.project4.utils.MainCoroutineRule
@@ -81,5 +82,57 @@ class SaveReminderViewModelTest {
 
     }
 
+    @Test
+    fun validateAndSaveReminder_validData_isTrue() {
+        // when save reminder nullable title
+        val validateEnteredData =
+            viewModel.validateEnteredData(FakeData.remindersDTOList.get(0).asReminderDataItem())
+        //Then
+        //check if valid data entered
+        assertThat(validateEnteredData).isTrue()
+        //check snake bar is shown and displaying message
 
+    }
+
+    @Test
+    fun saveReminder_validData_isTrueToast() {
+        // when save reminder nullable title
+        viewModel.saveReminder(FakeData.remindersDTOList[0].asReminderDataItem())
+        //Then
+        //check is not valid data entered
+        assertThat(viewModel.showToast.getOrAwaitValue()).isEqualTo(appContext.getString(R.string.reminder_saved))
+
+    }
+
+    @Test
+    fun saveGeoFence_geofenceAndLocationEnabled_showGeofenceAddedToast() {
+        // when save reminder nullable title
+        viewModel.dataItem.value = FakeData.remindersDTOList[0].asReminderDataItem()
+        //Then
+        viewModel.saveGeofence(true, true)
+        //check is not valid data entered
+        assertThat(viewModel.showToast.getOrAwaitValue()).isEqualTo(appContext.getString(R.string.geofence_added))
+
+
+    }
+
+    @Test
+    fun saveGeoFence_geofenceEnabledAndLocationDisabled_showGeofenceNotAdded() {
+        // when save reminder nullable title
+        viewModel.dataItem.value = FakeData.remindersDTOList[0].asReminderDataItem()
+        //Then
+        viewModel.saveGeofence(true, false)
+        //check is not valid data entered
+        assertThat(viewModel.showToast.getOrAwaitValue()).isEqualTo(appContext.getString(R.string.geofences_not_added))
+    }
+
+    @Test
+    fun saveGeoFence_geofenceDisabledAndLocationEnabled_showGeofenceNotAdded() {
+        // when save reminder nullable title
+        viewModel.dataItem.value = FakeData.remindersDTOList[0].asReminderDataItem()
+        //Then
+        viewModel.saveGeofence(false, true)
+        //check is not valid data entered
+        assertThat(viewModel.showToast.getOrAwaitValue()).isEqualTo(appContext.getString(R.string.geofences_not_added))
+    }
 }

@@ -8,12 +8,17 @@
 
 package com.udacity.project4.authentication
 
+import androidx.lifecycle.map
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 
 object AuthServiceLocator {
+    //to mock in testing class
     var auth = FirebaseAuth.getInstance()
 
-
+    val authState = FirebaseUserLiveData().map {
+        when (it) {
+            null -> AuthState.UNAUTHENTICATED
+            else -> AuthState.AUTHENTICATED
+        }
+    }
 }

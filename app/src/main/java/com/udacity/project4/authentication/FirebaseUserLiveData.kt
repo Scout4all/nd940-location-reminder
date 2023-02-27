@@ -19,14 +19,15 @@ class FirebaseUserLiveData : LiveData<FirebaseUser?>() {
     }
 
     override fun onActive() {
-        AuthServiceLocator.auth.addAuthStateListener (authStateListener)
+        AuthServiceLocator.auth.addAuthStateListener(authStateListener)
     }
 
     override fun onInactive() {
-        AuthServiceLocator.auth.removeAuthStateListener (authStateListener)
+        AuthServiceLocator.auth.removeAuthStateListener(authStateListener)
 
     }
 }
+
 enum class AuthState {
-    AUTHENTICATED,UNAUTHENTICATED
+    AUTHENTICATED, UNAUTHENTICATED
 }

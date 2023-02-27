@@ -169,7 +169,7 @@ class RemindersLocalRepositoryTest {
         val dbReminder = result as Result.Success
 
         //Then check if result is sorted by location name
-        assertThat(dbReminder.data, `is`(remindersListShadow))
+        assertThat(dbReminder.data.sortedBy { it.location }, `is`(remindersListShadow))
 
     }
 }

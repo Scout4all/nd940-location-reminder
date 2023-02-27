@@ -33,23 +33,24 @@ data class ReminderDTO(
     @ColumnInfo(name = "latitude") var latitude: Double?,
     @ColumnInfo(name = "longitude") var longitude: Double?,
     @PrimaryKey @ColumnInfo(name = "entry_id") var id: String = UUID.randomUUID().toString(),
-    @ColumnInfo(name = "notification_id") var notification_id : Int = ((System.currentTimeMillis() % 10000).toInt()),
+    @ColumnInfo(name = "notification_id") var notification_id: Int = ((System.currentTimeMillis() % 10000).toInt()),
+)
+
+fun ReminderDTO.asReminderDataItem(): ReminderDataItem {
+    return ReminderDataItem(
+        title = this.title,
+        description = this.description,
+        location = this.location,
+        latitude = this.latitude,
+        longitude = this.longitude,
+        id = this.id,
+        notification_id = this.notification_id
     )
-fun ReminderDTO.asReminderDataItem() : ReminderDataItem{
-  return ReminderDataItem(
-      title = this.title,
-      description = this.description,
-      location = this.location,
-      latitude = this.latitude,
-      longitude = this.longitude,
-      id = this.id,
-      notification_id = this.notification_id
-  )
 
 }
 
-fun List<ReminderDTO>.asReminderDataItemsList() :List< ReminderDataItem>{
-    return map{
+fun List<ReminderDTO>.asReminderDataItemsList(): List<ReminderDataItem> {
+    return map {
         ReminderDataItem(
             title = it.title,
             description = it.description,

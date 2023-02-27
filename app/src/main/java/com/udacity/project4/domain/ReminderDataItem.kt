@@ -22,10 +22,10 @@ data class ReminderDataItem(
     var latitude: Double?,
     var longitude: Double?,
     var id: String? = UUID.randomUUID().toString(),
-    var notification_id : Int = ((System.currentTimeMillis() % 10000).toInt()),
+    var notification_id: Int = ((System.currentTimeMillis() % 10000).toInt()),
 ) : Serializable
 
-fun ReminderDataItem.asReminderDataObject() : ReminderDTO {
+fun ReminderDataItem.asReminderDataObject(): ReminderDTO {
     return ReminderDTO(
         title = this.title,
         description = this.description,

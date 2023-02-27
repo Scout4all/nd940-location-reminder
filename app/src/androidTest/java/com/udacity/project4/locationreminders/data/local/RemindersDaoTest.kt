@@ -50,11 +50,10 @@ class RemindersDaoTest {
         ).allowMainThreadQueries().build()
 
 
-        insertReminders()
-
     }
 
-    private fun insertReminders() = mainCoroutineRule.runTest {
+    @Before
+    fun insertReminders() = mainCoroutineRule.runTest {
         FakeData.remindersDTOList.forEachIndexed { index, reminderDataItem ->
             database.reminderDao().saveReminder(reminderDataItem)
         }
@@ -117,7 +116,7 @@ class RemindersDaoTest {
 
 
     @Test
-    fun getAllReminders_returnSortedRemindersListByLocation() =
+    fun getAllReminders_returnSortedRemindersListByNotification() =
         mainCoroutineRule.runBlockingTest {
 
 
@@ -127,7 +126,7 @@ class RemindersDaoTest {
             // THEN - The loaded data is same as sorted fake data
             assertThat(
                 loaded,
-                `is`(FakeData.remindersDTOList.sortedBy { it.location })
+                `is`(FakeData.remindersDTOList.sortedByDescending { it.notification_id })
             )
 
 

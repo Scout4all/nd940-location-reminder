@@ -40,12 +40,12 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
                 }
 
 
-            Timber.e(geofencingEvent.triggeringGeofences.toString())
+                Timber.e(geofencingEvent.triggeringGeofences.toString())
 
-            if (geofencingEvent.geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER) {
+                if (geofencingEvent.geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER) {
 
-                GeofenceTransitionsJobIntentService.enqueueWork(context, intent)
-            }
+                    GeofenceTransitionsJobIntentService.enqueueWork(context, intent)
+                }
             }
 
         }

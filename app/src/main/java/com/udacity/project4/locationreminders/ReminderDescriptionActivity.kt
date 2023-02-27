@@ -16,8 +16,8 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import com.udacity.project4.authentication.AuthObserver
 import com.udacity.project4.R
+import com.udacity.project4.authentication.AuthServiceLocator
 import com.udacity.project4.authentication.AuthState
 import com.udacity.project4.authentication.AuthenticationActivity
 import com.udacity.project4.databinding.ActivityReminderDescriptionBinding
@@ -53,7 +53,7 @@ class ReminderDescriptionActivity : AppCompatActivity() {
             R.layout.activity_reminder_description
         )
 
-         val intent = getIntent()
+        val intent = getIntent()
 
         Timber.e(intent.getSerializableExtra(EXTRA_ReminderDataItem).toString())
         if (intent.getSerializableExtra(EXTRA_ReminderDataItem) != null) {
@@ -63,11 +63,12 @@ class ReminderDescriptionActivity : AppCompatActivity() {
         binding.reminderDataItem = reminderItem
 
     }
-    private fun checkLogin( ){
-        AuthObserver.authState.observe(this) {
+
+    private fun checkLogin() {
+        AuthServiceLocator.authState.observe(this) {
             if (it == AuthState.UNAUTHENTICATED) {
                 val intent = Intent(this, AuthenticationActivity::class.java)
-                intent.putExtra(INTENT_TO_DESCRIPTION_ACTIVITY,true)
+                intent.putExtra(INTENT_TO_DESCRIPTION_ACTIVITY, true)
                 startActivity(intent)
 
             }

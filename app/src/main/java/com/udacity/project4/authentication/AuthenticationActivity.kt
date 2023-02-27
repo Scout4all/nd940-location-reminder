@@ -38,7 +38,7 @@ class AuthenticationActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_authentication)
         binding.lifecycleOwner = this
 
-       val toDescription= getIntent().getBooleanExtra(INTENT_TO_DESCRIPTION_ACTIVITY,false)
+        val toDescription = getIntent().getBooleanExtra(INTENT_TO_DESCRIPTION_ACTIVITY, false)
         checkLogin(toDescription)
         binding.loginButton.setOnClickListener {
             signInFlow()
@@ -55,11 +55,11 @@ class AuthenticationActivity : AppCompatActivity() {
     }
 
     private fun checkLogin(toDescriptionActivity: Boolean) {
-        AuthObserver.authState.observe(this) {
+        AuthServiceLocator.authState.observe(this) {
             if (it == AuthState.AUTHENTICATED) {
-                if(toDescriptionActivity){
+                if (toDescriptionActivity) {
                     onBackPressed()
-                }else{
+                } else {
                     val intent = Intent(this, RemindersActivity::class.java)
                     startActivity(intent)
                     finish()
@@ -119,8 +119,9 @@ class AuthenticationActivity : AppCompatActivity() {
 
         }
     }
+
     val authState = FirebaseUserLiveData().map {
-        when(it){
+        when (it) {
             null -> AuthState.UNAUTHENTICATED
             else -> AuthState.AUTHENTICATED
         }

@@ -9,8 +9,8 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
 import com.udacity.project4.BuildConfig
 import com.udacity.project4.R
-import com.udacity.project4.locationreminders.ReminderDescriptionActivity
 import com.udacity.project4.domain.ReminderDataItem
+import com.udacity.project4.locationreminders.ReminderDescriptionActivity
 
 private const val NOTIFICATION_CHANNEL_ID = BuildConfig.APPLICATION_ID + ".channel"
 
@@ -39,7 +39,7 @@ fun sendNotification(context: Context, reminderDataItem: ReminderDataItem) {
         .addNextIntent(intent)
     val notificationPendingIntent = stackBuilder
         .getPendingIntent(reminderDataItem.notification_id, PendingIntent.FLAG_UPDATE_CURRENT)
-val contentText = "you have arrived to ${reminderDataItem.location}"
+    val contentText = "you have arrived to ${reminderDataItem.location}"
 //    build the notification object with the data to be shown
     val notification = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
         .setSmallIcon(R.drawable.ic_launcher_foreground)

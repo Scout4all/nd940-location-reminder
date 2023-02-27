@@ -122,7 +122,7 @@ class ReminderListFragmentTest : KoinTest {
         onView(withId(R.id.addReminderFAB)).perform(click())
 
         verify(navController).navigate(
-            ReminderListFragmentDirections.toSaveReminder( )
+            ReminderListFragmentDirections.toSaveReminder()
         )
     }
 
@@ -140,7 +140,8 @@ class ReminderListFragmentTest : KoinTest {
         )
 
         verify(navController).navigate(
-            ReminderListFragmentDirections.toSaveReminder().setDataItem(FakeData.reminderDataItemsList.get(0))
+            ReminderListFragmentDirections.toSaveReminder()
+                .setDataItem(FakeData.reminderDataItemsList.get(0))
         )
     }
 

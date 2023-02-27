@@ -86,7 +86,7 @@ class RemindersListViewModelTest {
             //check show loading view is gone
             showLoading = viewModel.showLoading.getOrAwaitValue()
             assertThat(showLoading, `is`(false))
-         //check if result is not empty
+            //check if result is not empty
             assertThat(result.isNotEmpty(), `is`(true))
             assertThat(result.size, `is`(remindersFakeRepository.remindersDao.size))
         }

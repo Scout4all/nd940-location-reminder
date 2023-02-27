@@ -11,7 +11,6 @@ package com.udacity.project4.locationreminders.geofence
 import android.annotation.SuppressLint
 import android.app.Application
 import android.app.PendingIntent
-import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
 import android.os.Build
@@ -34,12 +33,10 @@ class GeoFenceHelper(val base: Application) : ContextWrapper(base) {
         intent.action = ACTION_GEOFENCE_EVENT
 
         val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-           PendingIntent.FLAG_MUTABLE
+            PendingIntent.FLAG_IMMUTABLE
         } else {
             PendingIntent.FLAG_UPDATE_CURRENT
         }
-
-
 
 
         PendingIntent.getBroadcast(

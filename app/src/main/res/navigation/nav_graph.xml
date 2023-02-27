@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2023.
   ~ Developed by : Bigad Aboubakr
   ~ Developer website : http://bigad.me
@@ -38,10 +37,9 @@
             app:destination="@id/selectLocationFragment" />
         <argument
             android:name="dataItem"
-            app:argType="com.udacity.project4.domain.ReminderDataItem"
-            app:nullable="true"
             android:defaultValue="@null"
-              />
+            app:argType="com.udacity.project4.domain.ReminderDataItem"
+            app:nullable="true" />
 
 
     </fragment>

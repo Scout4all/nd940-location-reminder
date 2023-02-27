@@ -27,14 +27,14 @@ class RemindersFakeRepository : ReminderDataSource {
 
     }
 
-    override suspend fun getReminders(): Result<List<ReminderDTO>>  = withContext(ioDispatcher) {
+    override suspend fun getReminders(): Result<List<ReminderDTO>> = withContext(ioDispatcher) {
         wrapEspressoIdlingResource {
-            return@withContext try{
-                if(hasErrors){
+            return@withContext try {
+                if (hasErrors) {
                     throw Exception("Exception")
                 }
                 Result.Success(remindersDao)
-            }catch (ex : Exception){
+            } catch (ex: Exception) {
                 Result.Error(ex.localizedMessage)
 
             }
@@ -51,19 +51,20 @@ class RemindersFakeRepository : ReminderDataSource {
     }
 
 
-    override suspend fun getReminder(reminderId: String): Result<ReminderDTO>  = withContext(ioDispatcher) {
-        wrapEspressoIdlingResource {
-            return@withContext try{
-                if(hasErrors){
-                    throw Exception("Exception")
-                }
-                Result.Success(remindersDao.filter{ it.id ==reminderId }.single())
-            }catch (ex : Exception){
-                Result.Error(ex.localizedMessage)
+    override suspend fun getReminder(reminderId: String): Result<ReminderDTO> =
+        withContext(ioDispatcher) {
+            wrapEspressoIdlingResource {
+                return@withContext try {
+                    if (hasErrors) {
+                        throw Exception("Exception")
+                    }
+                    Result.Success(remindersDao.filter { it.id == reminderId }.single())
+                } catch (ex: Exception) {
+                    Result.Error(ex.localizedMessage)
 
+                }
             }
         }
-    }
 
     override suspend fun deleteAllReminders() {
         wrapEspressoIdlingResource {

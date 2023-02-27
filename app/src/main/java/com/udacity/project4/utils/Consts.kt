@@ -16,8 +16,8 @@ const val DEFAULT_ZOOM = 16f
 
 
 const val GEOFENCE_PENDING_INTENT_CODE = 0
-const val INTENT_TO_DESCRIPTION_ACTIVITY ="to_description_activity"
+const val INTENT_TO_DESCRIPTION_ACTIVITY = "to_description_activity"
 
-const val ACTION_GEOFENCE_EVENT =BuildConfig.APPLICATION_ID + "ACTION_GEOFENCE_EVENT"
+const val ACTION_GEOFENCE_EVENT = BuildConfig.APPLICATION_ID + "ACTION_GEOFENCE_EVENT"
 
 

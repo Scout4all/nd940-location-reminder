@@ -159,6 +159,12 @@ class RemindersActivityTest :
         register(dataBindingIdlingResource)
     }
 
+    @After
+    fun unregisterIdlingResource(): Unit = IdlingRegistry.getInstance().run {
+        unregister(EspressoIdlingResource.countingIdlingResource)
+        unregister(dataBindingIdlingResource)
+    }
+
     @Before
     fun initLogin() {
         val mockFirebaseUser: FirebaseUser = mock(FirebaseUser::class.java)
@@ -169,11 +175,6 @@ class RemindersActivityTest :
         `when`(firebaseMock.currentUser).thenReturn(mockFirebaseUser)
     }
 
-    @After
-    fun unregisterIdlingResource(): Unit = IdlingRegistry.getInstance().run {
-        unregister(EspressoIdlingResource.countingIdlingResource)
-        unregister(dataBindingIdlingResource)
-    }
 
     @Test
     fun addReminderTest_emptyTitle_ResultShowSnakeBar() {
@@ -209,7 +210,7 @@ class RemindersActivityTest :
 
 
     @Test
-    fun addReminderTest_ResultReminderAddedToRemindersList() {
+    fun addReminderTest_ResultReminderAddedToRemindersListAnd() {
         val reminderData = FakeData.remindersDTOList.get(0)
         val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
         dataBindingIdlingResource.monitorActivity(activityScenario)
@@ -222,14 +223,54 @@ class RemindersActivityTest :
 
         addReminderLocationAndSave(reminderData)
 
-        onView(withText(R.string.reminder_saved)).inRoot(ToastMatcher())
-            .check(matches(isDisplayed()))
 
         onView(withText(reminderData.title)).check(matches(isDisplayed()))
 
         activityScenario.close()
     }
 
+    @Test
+    fun saveReminderTest_ResultReminderSavedToastIsDisplayed() {
+        val reminderData = FakeData.remindersDTOList.get(0)
+        val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
+        dataBindingIdlingResource.monitorActivity(activityScenario)
+
+        onView(withId(R.id.addReminderFAB)).perform(click())
+
+        onView(withId(R.id.reminderTitle)).perform(typeText(reminderData.title))
+        onView(withId(R.id.reminderDescription)).perform(typeText(reminderData.description))
+        Espresso.closeSoftKeyboard()
+
+        addReminderLocationAndSave(reminderData)
+        Thread.sleep(2000)
+
+        onView(withText(R.string.reminder_saved)).inRoot(ToastMatcher())
+            .check(matches(isDisplayed()))
+
+        activityScenario.close()
+    }
+
+    @Test
+    fun saveReminderTest_ResultGeoFenceAddedToastIsDisplayed() {
+        val reminderData = FakeData.remindersDTOList.get(0)
+        val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
+        dataBindingIdlingResource.monitorActivity(activityScenario)
+
+        onView(withId(R.id.addReminderFAB)).perform(click())
+
+        onView(withId(R.id.reminderTitle)).perform(typeText(reminderData.title))
+        onView(withId(R.id.reminderDescription)).perform(typeText(reminderData.description))
+        Espresso.closeSoftKeyboard()
+
+        addReminderLocationAndSave(reminderData)
+
+        onView(withText(R.string.geofence_added)).inRoot(ToastMatcher())
+            .check(matches(isDisplayed()))
+
+
+
+        activityScenario.close()
+    }
 
     private fun addReminderLocationAndSave(reminderData: ReminderDTO) {
         onView(withId(R.id.selectLocation)).perform(click())
@@ -243,7 +284,6 @@ class RemindersActivityTest :
             onView(withId(R.id.location_name_et)).perform(typeText(reminderData.description))
             Espresso.closeSoftKeyboard()
             onView(withId(R.id.save_location_title_btn)).perform(click())
-
 
         }
         device.waitForIdle(5000)
@@ -322,8 +362,9 @@ class RemindersActivityTest :
                     allowGpsBtn.click()
                 } while (allowGpsBtn.exists())
             }
-            onView(withText(R.string.reminder_saved)).inRoot(ToastMatcher())
-                .check(matches(isDisplayed()))
+//            onView(withText(R.string.reminder_saved)).inRoot(ToastMatcher())
+//                .check(matches(isDisplayed()))
+
 
             onView(withText(reminderData.title)).check(matches(isDisplayed()))
 

@@ -47,7 +47,7 @@ import java.util.*
 class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
     private lateinit var mMapFragment: SupportMapFragment
-    private   val mIsLocationGranted = MutableLiveData(false)
+    private val mIsLocationGranted = MutableLiveData(false)
 
     //Use Koin to get the view model of the SaveReminder
 
@@ -88,7 +88,6 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         onPoiClicked(googleMap)
 
 
-
     }
 
     private fun grantLocation() {
@@ -103,13 +102,12 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     }
 
 
-
     private fun onPoiClicked(map: GoogleMap) {
         map.setOnPoiClickListener { poi ->
             binding.inputsContainer.visibility = View.GONE
             map.clear()
-            addMapMarker(map,poi.latLng,poi.name)
-            _viewModel.confirmAddLocation(poi.latLng,poi.name)
+            addMapMarker(map, poi.latLng, poi.name)
+            _viewModel.confirmAddLocation(poi.latLng, poi.name)
         }
     }
 
@@ -121,9 +119,9 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
             binding.inputsContainer.visibility = View.VISIBLE
 
             val placeName = binding.locationNameEt.text.trim().toString()
-            addMapMarker(googleMap,latLng,placeName)
+            addMapMarker(googleMap, latLng, placeName)
             binding.saveLocationTitleBtn.setOnClickListener {
-                binding.inputsContainer.visibility= View.GONE
+                binding.inputsContainer.visibility = View.GONE
                 it.let { activity?.hideKeyboard(it) }
                 _viewModel.confirmAddLocation(latLng)
             }
@@ -131,16 +129,16 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         }
     }
 
-private fun addMapMarker(map:GoogleMap,latLng:LatLng,title:String){
-    map.addMarker(
-        MarkerOptions().position(latLng).title(title)
-            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+    private fun addMapMarker(map: GoogleMap, latLng: LatLng, title: String) {
+        map.addMarker(
+            MarkerOptions().position(latLng).title(title)
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
 
-    )
-    addCircle(map, latLng)
-}
+        )
+        addCircle(map, latLng)
+    }
 
-    private fun addCircle(map: GoogleMap,latLng: LatLng, radius: Float = LOCATION_DEFAULT_RADIUS) {
+    private fun addCircle(map: GoogleMap, latLng: LatLng, radius: Float = LOCATION_DEFAULT_RADIUS) {
         val circleOptions = CircleOptions()
         circleOptions.radius(radius.toDouble())
         circleOptions.center(latLng)
@@ -181,41 +179,41 @@ private fun addMapMarker(map:GoogleMap,latLng:LatLng,title:String){
     }
 
 
-    private fun getCurrentLocation(map: GoogleMap , isLocationGranted : Boolean) {
+    private fun getCurrentLocation(map: GoogleMap, isLocationGranted: Boolean) {
         var lastKnownLocation: Location?
 
         val fusedLocationProviderClient: FusedLocationProviderClient =
             LocationServices.getFusedLocationProviderClient(requireActivity())
         try {
-                if (isLocationGranted) {
-                    map.isMyLocationEnabled = isLocationGranted
-                    val locationResult: Task<Location> = fusedLocationProviderClient.lastLocation
-                    locationResult.addOnCompleteListener(requireActivity()) { task ->
-                        if (task.isSuccessful) {
-                            // Set the map's camera position to the current location of the device.
-                            lastKnownLocation = task.result
-                            if (lastKnownLocation != null) {
-                                map.moveCamera(
-                                    CameraUpdateFactory.newLatLngZoom(
-                                        LatLng(
-                                            lastKnownLocation!!.latitude,
-                                            lastKnownLocation!!.longitude
-                                        ), DEFAULT_ZOOM
-                                    )
-                                )
-                            }
-                        } else {
-                            Timber.d("Current location is null. Using defaults.")
-                            Timber.e("Exception: %s", task.exception)
+            if (isLocationGranted) {
+                map.isMyLocationEnabled = isLocationGranted
+                val locationResult: Task<Location> = fusedLocationProviderClient.lastLocation
+                locationResult.addOnCompleteListener(requireActivity()) { task ->
+                    if (task.isSuccessful) {
+                        // Set the map's camera position to the current location of the device.
+                        lastKnownLocation = task.result
+                        if (lastKnownLocation != null) {
                             map.moveCamera(
                                 CameraUpdateFactory.newLatLngZoom(
-                                    DEFAULT_LOCATION_LATLNG,
-                                    DEFAULT_ZOOM
+                                    LatLng(
+                                        lastKnownLocation!!.latitude,
+                                        lastKnownLocation!!.longitude
+                                    ), DEFAULT_ZOOM
                                 )
                             )
-                            map.uiSettings.isMyLocationButtonEnabled = isLocationGranted
                         }
+                    } else {
+                        Timber.d("Current location is null. Using defaults.")
+                        Timber.e("Exception: %s", task.exception)
+                        map.moveCamera(
+                            CameraUpdateFactory.newLatLngZoom(
+                                DEFAULT_LOCATION_LATLNG,
+                                DEFAULT_ZOOM
+                            )
+                        )
+                        map.uiSettings.isMyLocationButtonEnabled = isLocationGranted
                     }
+                }
 
             }
 
@@ -250,7 +248,7 @@ private fun addMapMarker(map:GoogleMap,latLng:LatLng,title:String){
                             Manifest.permission.ACCESS_COARSE_LOCATION,
                             false
                         )) -> {
-                    mIsLocationGranted.value=true
+                    mIsLocationGranted.value = true
                 }
                 else -> {
                     Snackbar.make(
