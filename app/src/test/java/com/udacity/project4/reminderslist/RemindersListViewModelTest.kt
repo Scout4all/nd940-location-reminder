@@ -93,11 +93,18 @@ class RemindersListViewModelTest {
 
     @Test
     fun checkLoading_returnTrueWhenLoadThenFalse() = mainCoroutineRule.runBlockingTest {
-
+        mainCoroutineRule.pauseDispatcher()
         viewModel.loadReminders()
+
+        val loading = viewModel.showLoading.getOrAwaitValue()
+        assertThat(loading, `is`(true))
+
+        mainCoroutineRule.resumeDispatcher()
+
+        viewModel.remindersList.getOrAwaitValue()
+
         val result = viewModel.showLoading.getOrAwaitValue()
         assertThat(result, `is`(false))
-
     }
 
 
