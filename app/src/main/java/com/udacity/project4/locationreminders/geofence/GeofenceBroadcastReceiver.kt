@@ -32,22 +32,9 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
         Timber.e("GeoFence ${intent.extras.toString()}")
         if (intent.action == ACTION_GEOFENCE_EVENT) {
             val geofencingEvent: GeofencingEvent? = GeofencingEvent.fromIntent(intent)
-
             if (geofencingEvent != null) {
-                if (geofencingEvent.hasError()) {
-                    Timber.e(geofencingEvent.errorCode.toString())
-                    return
+                     GeofenceTransitionsJobIntentService.enqueueWork(context, intent)
                 }
-
-
-                Timber.e(geofencingEvent.triggeringGeofences.toString())
-
-                if (geofencingEvent.geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER) {
-
-                    GeofenceTransitionsJobIntentService.enqueueWork(context, intent)
-                }
-            }
-
         }
 
     }
